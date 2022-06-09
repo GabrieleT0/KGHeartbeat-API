@@ -8,6 +8,7 @@ import requests
 import validators
 from ExternalLink import ExternalLink
 from Resources import Resources
+import VoIDAnalyses, aggregator
 import query as q
 import networkx as nx
 import Graph
@@ -819,3 +820,23 @@ def checkGraphFile():
         nx.write_gpickle(graph,'GraphOfKG.gpickle') #STORE IT ON DISK
     
     return graph
+
+def checkVoidFile(idKG):
+    resources = aggregator.getOtherResources(idKG)
+    resources = insertAvailability(resources)
+    otResources = toObjectResources(resources)
+    urlV = getUrlVoID(otResources)
+    if isinstance(urlV,str):  # CHECKING IF VOID FILE IS AVAILABLE
+        try:
+            voidFile = VoIDAnalyses.parseVoID(urlV)
+            void = True
+        except:
+            try:
+                voidFile = VoIDAnalyses.parseVoIDTtl(urlV)
+                void = True
+            except:
+                return False 
+        if void == True:
+            return voidFile
+    else:
+        return False

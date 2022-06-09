@@ -1,9 +1,12 @@
+from importlib.metadata import metadata
 import json
 from os import access
+from site import execsitecustomize
 import socket
 from urllib.error import URLError
 from urllib.request import URLopener
-
+from numpy import source
+from rdflib import VOID, Graph as rdfG
 from requests import HTTPError
 import aggregator
 from quality_analysis.DataHubAPI import getLicense
@@ -14,6 +17,7 @@ import Graph
 import LOVAPI
 from SPARQLWrapper import SPARQLExceptions
 from bloomfilter import BloomFilter
+from sources import Sources
 
 class KnowledgeGraph:
     '''
@@ -828,9 +832,146 @@ class KnowledgeGraph:
         
         return trustValue
 
+    #VERIFIABILITY
+
+    def getVocabularies(self):
+        '''
+        Get all the vocabularies used in the KG. This information is retrived from the SPARQL endpoint or VOID file.
+
+        :return: vocabularies list
+        :rtype: list
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        voidFile = utils.checkVoidFile(self.id)
+        if isinstance(url,str):
+            try:
+                vocabularies = q.getVocabularies(url)
+            except:
+                vocabularies = 'SPARQL endpoint offline'
+                if not isinstance(voidFile,bool):  #IF SPARQL ENDPOINT IS OFFLINE TRY TO GET THE VOCABULARIES FROM VOID FILE
+                    vocabularies = VoIDAnalyses.getVocabularies(voidFile)
+        elif not isinstance(voidFile,bool): #IF SPARQL ENDPOINT IS ABSENT TRY TO GET THE VOCABULARIES FROM VOID FILE
+            vocabularies = VoIDAnalyses.getVocabularies(voidFile)
+        else:
+            vocabularies = 'Impossible to retrieve vocabularies from SPARQL endopoint or VOID file'
+        
+        return vocabularies
+
+    def getAuthors(self):
+        '''
+        Get all KG authors. This information is retrived from the SPARQL endpoint or VOID file.
+
+        :return: authors list.
+        :rtype: list
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        voidFile = utils.checkVoidFile(self.id)
+        if isinstance(url,str):
+            try:
+                authors = q.getCreator(url)
+            except:
+                authors = 'SPARQL endpoint offline'
+                if not isinstance(voidFile,bool):
+                    authors = VoIDAnalyses.getCreators(voidFile)
+        elif not isinstance(voidFile,bool):
+            authors = VoIDAnalyses.getCreators(voidFile)
+        else:
+            authors = 'Impossible to retrieve vocabularies from SPARQL endopoint or VOID file'
+        
+        return authors
+
+    def getPublishers(self):
+        '''
+        Get all the KG pubilshers. This information is retrived from the SPARQL endpoint or VOID file.
+
+        :return: publishers list.
+        :rtype: list
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        voidFile = utils.checkVoidFile(self.id)
+        if isinstance(url,str):
+            try:
+                publishers = q.getPublisher(url)
+            except:
+                publishers = 'SPARQL endpoint offline'
+                if not isinstance(voidFile,bool):
+                    publishers = VoIDAnalyses.getPublishers(voidFile)
+        elif not isinstance(voidFile,bool):
+            publishers = VoIDAnalyses.getPublishers(voidFile)
+        else:
+            publishers = 'Impossible to retrieve vocabularies from SPARQL endopoint or VOID file'
+
+        return publishers
+
+    def getContributors(self):
+        '''
+        Get all the KG contributors. This information is retrived from the SPARQL endpoint or VOID file.
+
+        :return: contributors list.
+        :rtype: list
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        voidFile = utils.checkVoidFile(self.id)
+        if isinstance(url,str):
+            try:
+                contributors = q.getContributors(url)
+            except:
+                contributors = 'SPARQL endpoint offline'
+                if not isinstance(voidFile,bool):
+                    contributors = VoIDAnalyses.getContributors(voidFile)
+        elif not isinstance(voidFile,bool):
+            contributors = VoIDAnalyses.getContributors(voidFile)
+        else:
+            contributors = 'Impossible to retrieve vocabularies from SPARQL endopoint or VOID file'
+        
+        return contributors
+    
+    def getSources(self):
+        '''
+        Get the KG sources. This return a Sources object that contains three field: web, email, name.
+        
+        :return: sources object with information about: web address, email, name authors or maintainer.
+        :rtype: Sourcecs object
+        '''
+        metadata = aggregator.getDataPackage(self.id)
+        sources = aggregator.getSource(metadata)
+        if sources == False:
+            sourcesObj = Sources('Absent','Absent','Absent')
+        else:
+            sourcesObj = Sources(sources.get('web','Absent'),sources.get('name','Absent'),sources.get('email','Absent'))
+        
+        return sourcesObj  #use sourcesKG() to print information about sources
+    
+    def checkSign(self):
+        '''
+        Check if the KG is signed.
+
+        :return: True if is signed, False otherwise.
+        :rtype: bool
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        if isinstance(url,str):
+            try:
+                sign = q.getSign(url)
+                if isinstance(sign,int):
+                    if sign > 0:
+                        signed = True
+                    else:
+                        signed = False
+                else:
+                    signed = False
+            except (HTTPError,URLError,SPARQLExceptions.EndPointNotFound,socket.gaierror,SPARQLExceptions.EndPointInternalError,json.JSONDecodeError, SPARQLExceptions.QueryBadFormed,SPARQLExceptions.Unauthorized):
+                signed = 'SPARQL endpoint offline'
+            except :
+                signed = 'Could not process formulated query on indicated endpoint'
+        else:
+            signed = 'SPARQL endpoint absent'
+        
+        return signed
+                
 
 
 
 kg = KnowledgeGraph('taxref-ld')
-result = kg.calculateTrustValue()
+result = kg.checkSign()
 print(result)
