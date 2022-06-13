@@ -1583,7 +1583,3 @@ class KnowledgeGraph:
         links = list(dict.fromkeys(links)) #REMOVE DUPLICATES IN THE LIST
 
         return links
-   
-kg = KnowledgeGraph('viaf')
-result = kg.getAccessAtKG()
-print(result)
