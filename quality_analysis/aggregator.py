@@ -61,7 +61,7 @@ def getTriples(metadata):
     elif numTriplesLODC != False:
         return numTriplesLODC
     else:
-        return 0
+        return False
 
 def getSPARQLEndpoint(idKG):
     metadataLODC = LODCloudAPI.getJSONMetadata(idKG)

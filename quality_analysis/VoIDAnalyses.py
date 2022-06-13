@@ -112,6 +112,7 @@ def getNumEntities(graph):
                 return o
             else:
                 return 'absent'
+    return 'information abaout entities absent'
 
 def getFrequency(graph):
     for s,p,o in graph:
@@ -119,8 +120,8 @@ def getFrequency(graph):
             o = str(o)
             if o != '':       
                 return o
-            else:
-                return 'absent'
+            
+    return 'absent'
 
 def getUriRegex(graph):
     regex = []

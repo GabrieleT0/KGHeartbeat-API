@@ -1,11 +1,15 @@
+import datetime
 from importlib.metadata import metadata
 import json
 from os import access
+import re
 from site import execsitecustomize
 import socket
 from urllib.error import URLError
 from urllib.request import URLopener
-from numpy import source
+from matplotlib.style import available
+from numpy import source, void
+import numpy
 from rdflib import VOID, Graph as rdfG
 from requests import HTTPError
 import aggregator
@@ -968,10 +972,618 @@ class KnowledgeGraph:
             signed = 'SPARQL endpoint absent'
         
         return signed
-                
+    
+    #CURRENCY
+
+    def getCreationDate(self):
+        '''
+        Get the KG creation date. This information is retrived from the SPARQL endpoint or VOID file. False is returned if SPARQL endpoint is offline
+
+        :return: KG creation date
+        :rtype: str
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        voidFile = utils.checkVoidFile(self.id)
+        if isinstance(url,str):
+            try:
+                creationD = q.getCreationDateMin(url)
+            except:
+                creationD = False
+                try:
+                    creationD = q.getCreationDate(url)
+                except:
+                    creationD = False
+                if not isinstance(voidFile,bool) and not isinstance(creationD,str):
+                    creationD = VoIDAnalyses.getCreationDate(voidFile)
+        elif not isinstance(voidFile,bool):
+            creationD = VoIDAnalyses.getCreationDate(voidFile)
+        else:
+            creationD = 'SPARQL endpoint and VoID absent'
+
+        return creationD
+
+    def getModificationDate(self):
+        '''
+        Get the KG modification date. This information is retrived from SPARQL endpoint or VOID file. False is returned if SPARQL endpoint is offline.
+
+        :return: KG modification date.
+        :rtype: str
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        voidFile = utils.checkVoidFile(self.id)
+        if isinstance(url,str):
+            try:
+                modificationD = q.getModificationDateMax(url)
+            except:
+                modificationD = False
+                try:
+                    modificationD = q.getModificationDate(url)
+                except:
+                    modificationD = False
+                if not isinstance(voidFile,bool) and not isinstance(modificationD,str):
+                    modificationD = VoIDAnalyses.getCreationDate(voidFile)
+        elif not isinstance(voidFile,bool):
+            modificationD = VoIDAnalyses.getCreationDate(voidFile)
+        else:
+            modificationD = 'SPARQL endpoint and VoID absent'
+
+        return modificationD
+    
+    def getPercentageUpData(self,modificationDate):
+        '''
+        Get the percentage of updated data. The percentage is calcualted based on the modificationDate given as a parameter.
+
+        :return: percentage of updated data.
+        :rtype: str
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        if isinstance(url,str):
+            try:
+                numTriplesUp = q.getNumUpdatedData(url,modificationDate)
+            except:
+                numTriplesUp = 'SPARQL endpoint offline'
+        else:
+            numTriplesUp = 'SPARQL endpoint absent'
+
+        return numTriplesUp
+    
+    def getLastUp(self):
+        '''
+        Get the elapsed time since the last modification (in days).
+
+        :return: days that have passed since the last modification.
+        :rtype: int
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        voidFile = utils.checkVoidFile(self.id)
+        if isinstance(url,str):
+            try:
+                modificationD = q.getModificationDateMax(url)
+            except:
+                modificationD = False
+                try:
+                    modificationD = q.getModificationDate(url)
+                except:
+                    modificationD = False
+                if not isinstance(voidFile,bool) and not isinstance(modificationD,str):
+                    modificationD = VoIDAnalyses.getCreationDate(voidFile)
+        elif not isinstance(voidFile,bool):
+            modificationD = VoIDAnalyses.getCreationDate(voidFile)
+        else:
+            modificationD = 'SPARQL endpoint and VoID absent'
+        try:
+            today = datetime.date.today()
+            todayFormatted = today.strftime("%Y-%m-%d")
+            todayDate =  datetime.datetime.strptime(todayFormatted, "%Y-%m-%d").date()
+            modificationD = datetime.datetime.strptime(modificationD, "%Y-%m-%d").date()
+            delta = (todayDate - modificationD).days
+        except:
+            delta = 'Insufficient data'
 
 
+        return delta
 
-kg = KnowledgeGraph('taxref-ld')
-result = kg.checkSign()
+    #VOLATILITY
+    
+    def getFrequencyUp(self):
+        '''
+        Get the KG update frequency. This information is retrived from SPARQL endpoint or VOID file.
+
+        :return: KG update frequency.
+        :rtype: str
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        voidFile = utils.checkVoidFile(self.id)
+        if isinstance(url,str):
+            try:
+                frequency = q.getFrequency(url)
+            except:
+                frequency = 'SPARQL endpoint offline'
+                if not isinstance(voidFile,bool):
+                    frequency = VoIDAnalyses.getFrequency(voidFile)
+        elif not isinstance(voidFile,bool):
+            frequency = VoIDAnalyses.getFrequency(voidFile)
+        else:
+            frequency = 'SPARQL endpoint and VoID file absent'
+
+        return frequency
+    
+    #COMPLETENESS
+
+    def getInterlinkingComp(self):
+        '''
+        Calcuate the interlinking completeness. It is calculated by the ratio between the number of linked triples and number of all triples in the dataset.
+
+        :return: interlinking completeness.
+        :rtype: int
+        '''
+        externalLinks = aggregator.getExternalLinks(self.id)
+        exLinksObj = utils.toObjectExternalLinks(externalLinks)
+        triplesL = 0
+        for i in range(len(exLinksObj)): #COUNTING THE NUMBER OF TRIPLES CROSS EXTERNAL LINK LIST IN THE METADATA
+            link = exLinksObj[i]
+            value = link.value
+            value = str(link.value)
+            value = re.sub("[^\d\.]", "",value) #CHECK IF THE VALUE IS A NUMBER
+            value = int(value)
+            triplesL = triplesL + value
+        url = aggregator.getSPARQLEndpoint(self.id)
+        if isinstance(url,str):
+            try:
+                triples = q.getNumTripleQuery(url) #COUNT THE NUMBER OF TRIPLES WITH A SPARQL QUERY
+            except:   #IF SPARQL ENDPOINT IS OFFLINE, COUNT THE TRIPLES BY ANALYZING THE METADATA
+                triples = 'SPARQL endpoint offline'
+                metadata = aggregator.getDataPackage(self.id)
+                triples = aggregator.getTriples(metadata)
+        else:
+            triples = 'SPARQL endpoint and VoID file absent'
+        
+        try:
+            triplesL = int(triplesL)
+            triples = int(triples)
+            if triples > 0:
+                iCompl = (triplesL/triples)
+                iCompl = "%.2f"%iCompl
+            else:
+                iCompl = 'Insufficient data'
+        except:
+            iCompl = 'Insufficient data'
+
+        return iCompl
+    
+    #AMOUNT OF DATA
+
+    def getNumTriples(self):
+        '''
+        Get the number of triples in the KG. This information can be obtained by SPARQL endpoint or analyzing the metadata of the dataset.
+
+        :return: Number of triples.
+        :rtype: int
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        metadata = aggregator.getDataPackage(self.id)
+        if isinstance(url,str):
+            try:
+                triples = q.getNumTripleQuery(url)
+            except:
+                triples = 'SPARQL endpoint offline'
+                triples = aggregator.getTriples(metadata)
+        else:
+            triples = aggregator.getTriples(metadata)
+
+        return triples
+    
+    def getNumEntities(self):
+        '''
+        Count the number of entities in the dataset. This information can be obtained by a SPARQL endpoint or analyzing the VoID file.
+
+        :return: The number of entities in the KG.
+        :rtype: int
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        voidFile = utils.checkVoidFile(self.id)
+        if isinstance(url,str):
+            try:
+                entities = q.getNumEntities(url)
+                try:
+                    entities = int(entities)
+                    return entities
+                except:  #IF WITH THE FIRST QUERY WE DON'T GET THE RESULT, WE TRY TO COUNT THE NUMBER OF ENTITIES BY COUNTING THE NUMBER OF TRIPLES THAT MATH WITH THEKG URI REGEX
+                    #GET THE REGEX OF THE URLs USED
+                    regex = []
+                    try:
+                        regex = q.checkUriRegex(url)
+                    except:
+                        regex = 'Could not process formulated query on indicated enpdoint'
+                    
+                    #CHECK IF IS INDICATED A URI SPACE INSTEAD OF A REGEX AND WE TRAFORM IT TO REGEX
+                    try:    
+                        pattern = q.checkUriPattern(url)  
+                        if isinstance(pattern,list):
+                            for i in range(len(pattern)): 
+                                newRegex = utils.trasforrmToRegex(pattern[i])
+                                regex.append(newRegex)
+                    except:
+                        pattern = 'Could not process formulated query on indicated enpdoint'
+
+                    #NOW COUNT THE ENITITIES USING THE REGEX
+                    try:
+                        if len(regex) > 0:
+                            entities = 0
+                            for i in range(len(regex)):
+                                entities = entities + q.getNumEntitiesRegex(url,regex[i])
+                        else:
+                            entities = 'insufficient data'
+                    except Exception as e:
+                        entities = e
+                    
+                    return entities
+            except:
+                if not isinstance(voidFile,bool):
+                    entities = VoIDAnalyses.getNumEntities(voidFile)
+                    return entities
+        elif not isinstance(voidFile,bool):
+            entities = VoIDAnalyses.getNumEntities(voidFile)
+            return entities
+        else:
+            return 'SPARQL endpoint and VoID file absent'
+
+    def getNumProperty(self):
+        '''
+        Get the number of property in the KG. This information is retrived by executing a query on the SPARQL endpoint.
+
+        :return: poperty number
+        :rtype: int
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        if isinstance(url,str):
+            try:
+                numProperty = q.numberOfProperty(url)
+            except:
+                numProperty = 'SPARQL endpoint offline'
+        else:
+            numProperty = 'SPARQL endpoint absent'
+
+        return numProperty
+
+    #REPRESENTATIONAL-CONCISENESS
+    
+    def getUriLenghtSub(self):
+        '''
+        Get the uri's length in the subject position. The returned value is a list in which the values are respectively min-max-average-standard deviation.
+
+        :return: subject uri's length.
+        :rtype: list
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        if isinstance(url,str):
+            try:
+                lengthtList = []
+                triples = q.getAllTriplesSPO(url)
+                for triple in triples:
+                    s = triple.get('s')
+                    uri = s.get('value')
+                    if utils.checkURI(uri) == True:
+                        lengthtList.append(len(uri))
+                sumLenghts = sum(lengthtList)
+                avLenghts = sumLenghts/len(lengthtList) 
+                avLenghts = str(avLenghts)
+                avLenghts = avLenghts.replace('.',',')
+                standardDeviationL = numpy.std(lengthtList)
+                standardDeviationL = str(standardDeviationL)
+                standardDeviationL = standardDeviationL.replace('.',',')
+                minLenghtS = min(lengthtList)
+                maxLenghtS = max(lengthtList)
+                length = [minLenghtS,maxLenghtS,avLenghts,standardDeviationL]
+            except:
+                length = 'SPARQL endpoint offline'
+        else:
+            length = 'SPARQL endpoint absent'
+
+        return length
+    
+    def getUriLenghtObj(self):
+        '''
+        Get the uri's length in the object position. The returned value is a list in which the values are respectively min-max-average-standard deviation.
+
+        :return: object uri's length.
+        :rtype: list
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        if isinstance(url,str):
+            try:
+                uriListO = q.getAllObject(url)
+                lengthtList = []
+                for triple in uriListO:
+                    if utils.checkURI(triple) == True:
+                        lengthtList.append(len(triple))
+                sumLenghts = sum(lengthtList)
+                avLenghts = sumLenghts/len(lengthtList) 
+                avLenghts = str(avLenghts)
+                avLenghts = avLenghts.replace('.',',')
+                standardDeviationL = numpy.std(lengthtList)
+                standardDeviationL = str(standardDeviationL)
+                standardDeviationL = standardDeviationL.replace('.',',')
+                minLenghtS = min(lengthtList)
+                maxLenghtS = max(lengthtList)
+                length = [minLenghtS,maxLenghtS,avLenghts,standardDeviationL]
+            except:
+                length = 'SPARQL endpoint offline'
+        else:
+            length = 'SPARQL endpoint absent'
+
+        return length
+    
+    def getUriLenghtPr(self):
+        '''
+        Get the uri's length in the predicate position. The returned value is a list in which the values are respectively min-max-average-standard deviation.
+
+        :return: predicate uri's length.
+        :rtype: list
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        if isinstance(url,str):
+            try:
+                uriListP = q.getAllPredicate(url)
+                lengthtList = []
+                for triple in uriListP:
+                    if utils.checkURI(triple) == True:
+                        lengthtList.append(len(triple))
+                sumLenghts = sum(lengthtList)
+                avLenghts = sumLenghts/len(lengthtList) 
+                avLenghts = str(avLenghts)
+                avLenghts = avLenghts.replace('.',',')
+                standardDeviationL = numpy.std(lengthtList)
+                standardDeviationL = str(standardDeviationL)
+                standardDeviationL = standardDeviationL.replace('.',',')
+                minLenghtS = min(lengthtList)
+                maxLenghtS = max(lengthtList)
+                length = [minLenghtS,maxLenghtS,avLenghts,standardDeviationL]
+            except:
+                length = 'SPARQL endpoint offline'
+        else:
+            length = 'SPARQL endpoint absent'
+
+        return length
+
+    def checkRDFStr(self):
+        '''
+        Check if RDF data structures is used in the KG. 
+
+        :return: True is are used, False otherwise.
+        :rtype: bool
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        if isinstance(url,str):
+            try:
+                rdf = q.checkRDFDataStructures(url)
+            except:
+                rdf = 'SPARQL endpoint offline'
+        else:
+            rdf = 'SPARQL endpoint absent'
+
+        return rdf
+
+    #REPRESENTATIONAL-CONSISTENCY
+
+    def checkReuseTerms(self):
+        '''
+        Check usage of existing terms. This check is done using the Linked Open Vocabulary, a KG that contains vocabulary and terms standard for Linked Open Data.
+
+        :return: True if no new terms are defined, False otherwise.
+        :rtype: bool
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        if isinstance(url,str):
+            try:
+                objList = []
+                triplesO = q.getAllTypeO(url)
+                for term in triplesO:
+                    objList.append(term)
+                newTermsD = LOVAPI.searchTermsList(objList)
+                if len(newTermsD) > 0:
+                    return False
+                else:
+                    return True
+            except:
+                return 'SPARQL endpoint offline'
+        else:
+            return 'SPARQL endpoint absent'
+    
+    def checkReuseVocabs(self):
+        '''
+        Check usage of existing vocabularies. This check is done using the Linked Open Vocabulary, a KG that contains vocabularies and terms standard for Linked Open Data.
+
+        :return: True if no new vocabularies are defined, False otherwise.
+        :rtype: bool
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        if isinstance(url,str):
+            try:
+                newVocab = []
+                vocabs = q.getVocabularies(url)
+                if isinstance(vocabs,list):
+                    for vocab in vocabs:
+                        result = LOVAPI.findVocabulary(vocab)
+                        if result == False:
+                            newVocab.append(vocab)
+                    if len(newVocab) > 0:
+                        return False
+                    else:
+                        return True
+                else:
+                    return 'Impossible to retrieve KG vocabularies'
+            except:
+                return 'SPARQL endpoint offline'
+        else:
+            return 'SPARQL endpoint absent'
+
+    #UNDERSTENDABILITY
+
+    def getNumLabels(self):
+        '''
+        Count the number of label on the triples in the KG. This count is done by using a query on the SPARQL endpoint.
+
+        :return: Number of label in the KG.
+        :rtype: int
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        if isinstance(url,str):
+            try:
+                numLabel = q.getNumLabel(url)
+            except:
+                numLabel = 'SPARQL endpoint offline'
+        else:
+            numLabel = 'SPARQL endpoint absent'
+        
+        return numLabel
+
+    def getRegex(self):
+        '''
+        Return the uri regex of the KG. This check id done by using a query on the SPARQL endpoin or by analyzing the VoID file if available.
+
+        :return: A list with the uri regex.
+        :rtype: list
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        voidFile = utils.checkVoidFile(self.id)
+        if isinstance(url,str):
+            regex = []
+            try:
+                regex = q.checkUriRegex(url)
+            except Exception as e:
+                regex = 'SPARQL endpoint offline'
+                if not isinstance(voidFile,bool):
+                    regex = VoIDAnalyses.getUriRegex(voidFile) 
+            #CHECK IF IS INDICATED A URI SPACE INSTEAD OF A REGEX AND WE TRAFORM IT TO REGEX
+            try:    
+                pattern = q.checkUriPattern(url)  
+                if isinstance(pattern,list):
+                    for i in range(len(pattern)): 
+                        newRegex = utils.trasforrmToRegex(pattern[i])
+                        regex.append(newRegex)
+            except:
+                pattern = 'SPARQL endpoint offline'
+        elif not isinstance(voidFile,bool):
+            regex = VoIDAnalyses.getUriRegex(voidFile)
+        else:
+            regex = 'SPARQL endpint absent'
+        
+        return regex
+
+    def checkExample(self):
+        '''
+        Check if query examples are provided with the KG. This information is obtained by analyzing the KG metadata, in particular, the field other resources.
+
+        :return: True if there are any query examples, False otherwise.
+        :rtype: bool
+        '''
+        resources = aggregator.getOtherResources(self.id)
+        resources = utils.insertAvailability(resources)
+        otResources = utils.toObjectResources(resources)
+        example = False
+        for j in range(len(otResources)):
+            if isinstance(otResources[j].format,str):
+                if 'example' in otResources[j].format:
+                    example = True
+            if isinstance(otResources[j].title,str):
+                if 'example' in otResources[j].title:
+                    example = True
+
+        return example
+    
+    #INTERPRETABILITY
+
+    def getNumbBN(self):
+        '''
+        Get the blank node number. This is obtained by querying the SPARQL endpoint.
+
+        :return: blank node number.
+        :rtype: int
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        if isinstance(url,str):
+            try:
+                numBlankN = q.numBlankNode(url)
+            except:
+                numBlankN = 'SPARQL endpoint offline'
+        else:
+            numBlankN = 'SPARQL endpoint absent'
+
+        return numBlankN
+    
+    #VERSATILIY
+
+    def getSerializationFormat(self):
+        '''
+        Get the KG serialization formats. This information is retrived by executing a query on the SPARQL endpoint or from VoID file if available.
+
+        :return: list of serialization formats.
+        :rtype: list
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        voidFile = utils.checkVoidFile(self.id)
+        if isinstance(url,str):
+            try:
+                formats = q.checkSerialisationFormat(url)
+            except:
+                formats = 'SPARQL endpoint offline'
+                if not isinstance(voidFile,bool):
+                    formats = VoIDAnalyses.getSerializationFormats(voidFile)
+        elif not isinstance(voidFile,bool):
+            formats = VoIDAnalyses.getSerializationFormats(voidFile)
+        else:
+            formats = 'SPARQL endpoint and VoID file absent'
+        
+        return formats
+    
+    def getLanguages(self):
+        '''
+        Get the languages supported by the KG. This information is retrieved by querying the SPARQL endpoint.
+        
+        :return: a list with all language supported.
+        :rtype: list
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        if isinstance(url,str):
+            try:
+                languages = q.getLangugeSupported(url)
+            except:
+                languages = 'SPARQL endpoint offline'
+        else:
+            languages = 'SPARQL endpoint absent'
+        
+        return languages
+    
+    def getAccessAtKG(self):
+        '''
+        Get the ways in which you can access the KG. This information is retrived by analyzing the metadata and/or querying the SPARQL endpoint.
+
+        :return: a list with the links to access at the KG.
+        :rtype: list
+        '''
+        links = []
+        url = aggregator.getSPARQLEndpoint(self.id)
+        voidFile = utils.checkVoidFile(self.id)
+        resources = aggregator.getOtherResources(self.id)
+        resources = utils.insertAvailability(resources)
+        links = links + utils.getLinkDownload(resources)
+        if isinstance(url,str):
+            links.append(url)
+            try:
+                urlList = q.checkDataDump(url)
+                if isinstance(urlList,list):
+                    activeUrl = utils.getActiveDumps(urlList)
+                    links = links + activeUrl
+            except:
+                pass
+        elif not isinstance(voidFile,bool):
+            links = links + VoIDAnalyses.getDataDump(voidFile)
+        
+        links = list(dict.fromkeys(links)) #REMOVE DUPLICATES IN THE LIST
+
+        return links
+   
+kg = KnowledgeGraph('viaf')
+result = kg.getAccessAtKG()
 print(result)
