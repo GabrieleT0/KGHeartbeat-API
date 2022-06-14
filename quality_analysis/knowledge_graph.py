@@ -68,12 +68,11 @@ class KnowledgeGraph:
         :return: The availability of rdf dump.
         :rtype: bool
         '''
-        li = []
         resources = aggregator.getOtherResources(self.id)
         resources = utils.insertAvailability(resources)
         available = utils.checkAvailabilityForDownload(resources)
 
-        return li
+        return available
     
     def checkInactiveLinks(self):
         '''

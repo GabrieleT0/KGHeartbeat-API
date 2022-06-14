@@ -32,11 +32,11 @@ class KnowledgeGraphTestCase(unittest.TestCase):
     
     def testCC(self):
         result = self.kg.getClusteringCoefficient()
-        self.assertEqual(result,0.048)
+        self.assertEqual(result,0.047619047619047616)
     
     def testCentrality(self):
         result = self.kg.getCentrality()
-        self.assertEqual(result,0.003)
+        self.assertEqual(result,0.003769520732364028)
     
     def testSameAs(self):
         result = self.kg.getSameAsChains()
@@ -76,7 +76,7 @@ class KnowledgeGraphTestCase(unittest.TestCase):
     
     def testDisjoint(self):
         result = self.kg.getDisjointValue()
-        self.assertEqual(result,5.00)
+        self.assertEqual(result,5.009195432784335e-07)
     
     def testUndfClass(self):
         result = self.kg.getUndefinedClass()
@@ -104,15 +104,15 @@ class KnowledgeGraphTestCase(unittest.TestCase):
     
     def testIntC(self):
         result = self.kg.getIntensionalConc()
-        self.assertEqual(result,0.989)
+        self.assertEqual(result,0.9885550786838341)
     
     def testExC(self):
         result = self.kg.getExtensionaConc()
-        self.assertEqual(result,0.986)
+        self.assertEqual(result,0.9863)
     
     def testPR(self):
         result = self.kg.getPageRank()
-        self.assertEqual(result,0.0011)
+        self.assertEqual(result,0.0011207680563983555)
     
     def testName(self):
         result = self.kg.getName()
@@ -176,7 +176,7 @@ class KnowledgeGraphTestCase(unittest.TestCase):
     
     def testInterlC(self):
         result = self.kg.getInterlinkingComp()
-        self.assertEqual(result,0.0)
+        self.assertEqual(result,'0.00')
     
     def testNumTriples(self):
         result = self.kg.getNumTriples()
