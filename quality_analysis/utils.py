@@ -9,7 +9,7 @@ import requests
 import validators
 from ExternalLink import ExternalLink
 import VoIDAnalyses, aggregator
-from Resources import Resources
+from resources import Resources
 import query as q
 import networkx as nx
 import Graph
