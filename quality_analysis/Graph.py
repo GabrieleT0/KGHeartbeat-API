@@ -2,9 +2,9 @@ import json
 import os
 import string
 import networkx as nx
-import AGAPI
-import aggregator
-import utils
+from quality_analysis import AGAPI
+from quality_analysis import aggregator
+from quality_analysis import utils
 from networkx.readwrite import json_graph
 import re
 

@@ -1,3 +1,4 @@
+from copyreg import pickle
 import re
 import ssl
 import time
@@ -7,8 +8,8 @@ import mechanize
 import requests
 import validators
 from ExternalLink import ExternalLink
-from Resources import Resources
 import VoIDAnalyses, aggregator
+from Resources import Resources
 import query as q
 import networkx as nx
 import Graph

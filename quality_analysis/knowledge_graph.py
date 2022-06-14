@@ -12,7 +12,7 @@ from numpy import source, void
 import numpy
 from rdflib import VOID, Graph as rdfG
 from requests import HTTPError
-import aggregator
+from quality_analysis import aggregator
 from quality_analysis.DataHubAPI import getLicense
 import query as q
 import utils
@@ -68,11 +68,12 @@ class KnowledgeGraph:
         :return: The availability of rdf dump.
         :rtype: bool
         '''
+        li = []
         resources = aggregator.getOtherResources(self.id)
         resources = utils.insertAvailability(resources)
         available = utils.checkAvailabilityForDownload(resources)
 
-        return available
+        return li
     
     def checkInactiveLinks(self):
         '''
@@ -171,8 +172,9 @@ class KnowledgeGraph:
         '''
         graph = utils.checkGraphFile()
         lcc = Graph.getClusteringCoefficient(graph,self.id)
+        lcc = "%.3f"%lcc
         
-        return lcc
+        return float(lcc)
     
     def getCentrality(self):
         '''
@@ -184,8 +186,9 @@ class KnowledgeGraph:
         '''
         graph = utils.checkGraphFile()
         centrality = Graph.getCentrality(graph,self.id)
+        centratility = "%.3f"%centrality
 
-        return centrality
+        return float(centrality)
 
     def getSameAsChains(self):
         '''
@@ -422,6 +425,8 @@ class KnowledgeGraph:
                         numEntities = int(numEntities)
                         if numEntities > 0:
                             disjointValue = numDisjoint/numEntities
+                            disjointValue = "%.3f"%disjointValue
+                            disjointValue = float(disjointValue)
                         else:
                             disjointValue = 'insufficient data'
                     except:
@@ -672,6 +677,8 @@ class KnowledgeGraph:
                                 duplicateP.append(triplePropList[j])
                         if len(allProperty) > 0:
                             intC = 1.0 - (len(duplicateP)/len(allProperty))
+                            intC = "%.3f"%intC
+                            intC = float(intC)
                         else:
                             intC = 'insufficient data'
                     else:
@@ -724,6 +731,8 @@ class KnowledgeGraph:
 
                         if len(allTriples) > 0:
                             exC = 1.0 - (len(duplicate)/len(allTriples)) # From: Evaluating the Quality of the LOD Cloud: An Empirical Investigation (Ruben Verborgh)
+                            exC = "%.3f"%exC
+                            exC = float(exC)
                         else:
                             exC = 'insufficient data'
                     else:
@@ -749,8 +758,9 @@ class KnowledgeGraph:
         '''
         graph = utils.checkGraphFile()
         pageRank = Graph.getPageRank(graph,self.id)
+        pageRank = "%.4f"%pageRank
 
-        return pageRank
+        return float(pageRank)
     
     #BELIEVABILITY
     def getName(self):
@@ -1144,6 +1154,7 @@ class KnowledgeGraph:
             if triples > 0:
                 iCompl = (triplesL/triples)
                 iCompl = "%.2f"%iCompl
+                iCompl = float(iCompl)
             else:
                 iCompl = 'Insufficient data'
         except:
