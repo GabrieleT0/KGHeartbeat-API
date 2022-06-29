@@ -9,7 +9,7 @@ pip install kg-qa
 ### Get started 
 How check SPARQL endpoint availability with this library:
 ```Python
-from quality_analysis import KnowledgeGraph
+from kg_qa import KnowledgeGraph
 
 # Instanziate a KnowledgeGraph object, passing the id of the kg to be analyzed
 kg = KnowledgeGraph('dbpedia')

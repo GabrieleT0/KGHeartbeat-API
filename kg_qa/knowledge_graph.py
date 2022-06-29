@@ -9,8 +9,8 @@ from numpy import source, void
 import numpy
 from rdflib import VOID, Graph as rdfG
 from requests import HTTPError
-from quality_analysis import aggregator
-from quality_analysis.DataHubAPI import getLicense
+from kg_qa import aggregator
+from kg_qa.DataHubAPI import getLicense
 import query as q
 import utils
 import VoIDAnalyses

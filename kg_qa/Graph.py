@@ -2,10 +2,9 @@ import json
 import os
 import string
 import networkx as nx
-from quality_analysis import AGAPI
-from quality_analysis import aggregator
-from quality_analysis import utils
-from networkx.readwrite import json_graph
+from kg_qa import AGAPI
+from kg_qa import aggregator
+from kg_qa import utils
 import re
 
 def buildGraph():

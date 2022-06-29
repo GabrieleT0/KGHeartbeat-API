@@ -1,0 +1,1 @@
+from kg_qa.knowledge_graph import KnowledgeGraph
