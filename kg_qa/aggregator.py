@@ -1,7 +1,7 @@
 from types import NoneType
-import DataHubAPI
-import LODCloudAPI
-import utils
+from kg_qa import DataHubAPI
+from kg_qa import LODCloudAPI
+from kg_qa import utils
 
 def getDataPackage(idKG):
     metadataDH = DataHubAPI.getDataPackage(idKG)

@@ -8,11 +8,10 @@ import mechanize
 import requests
 import validators
 from ExternalLink import ExternalLink
-import VoIDAnalyses, aggregator
+from kg_qa import VoIDAnalyses, aggregator,Graph
 from resources import Resources
-import query as q
+from kg_qa import query as q
 import networkx as nx
-import Graph
 
 #PRINT THE METADATI OF A KG
 def printMetadatiKG(metadct):

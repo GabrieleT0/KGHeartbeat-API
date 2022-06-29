@@ -1,8 +1,5 @@
-import json
 from urllib import response
 import requests
-import utils
-
 def getJSONMetadata(idKG):
     url = 'https://lod-cloud.net/json/%s'%idKG
     try:

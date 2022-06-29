@@ -1,6 +1,5 @@
-import json
 import requests
-import utils
+
 
 #INPUT: DATASET ID TO LOOK FOR
 #OUTPUT: FILE JSON WITH METADATA OF THE DATASET

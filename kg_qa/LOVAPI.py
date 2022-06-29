@@ -1,6 +1,5 @@
 from xml.dom.minidom import Notation
 import requests
-from rdflib import Graph
 
 def log_in_out(func):
     from time import perf_counter

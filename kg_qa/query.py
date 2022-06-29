@@ -4,7 +4,7 @@ from SPARQLWrapper import *
 from SPARQLWrapper import SPARQLWrapper
 from xml.dom.minidom import Document
 import time
-import utils
+from kg_qa import utils
 
 def log_in_out(func):
 

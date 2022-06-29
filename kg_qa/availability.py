@@ -1,6 +1,6 @@
 from os import access
-import query as q
-import utils
+from kg_qa import query as q
+from kg_qa import utils
 
 def checkEndpoindAv(url):
     '''

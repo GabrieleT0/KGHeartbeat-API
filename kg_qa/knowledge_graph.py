@@ -10,15 +10,11 @@ import numpy
 from rdflib import VOID, Graph as rdfG
 from requests import HTTPError
 from kg_qa import aggregator
-from kg_qa.DataHubAPI import getLicense
-import query as q
-import utils
-import VoIDAnalyses
-import Graph
-import LOVAPI
+from kg_qa import query as q
+from kg_qa import utils,VoIDAnalyses,Graph,LOVAPI
 from SPARQLWrapper import SPARQLExceptions
-from bloomfilter import BloomFilter
-from sources import Sources
+from kg_qa.bloomfilter import BloomFilter
+from kg_qa.sources import Sources
 
 class KnowledgeGraph:
     '''

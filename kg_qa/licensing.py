@@ -1,4 +1,4 @@
-import query as q
+from kg_qa import query as q
 
 def getLicenseMR(url):
     '''
