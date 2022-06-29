@@ -6,7 +6,7 @@ Library that allows you to perform Knowledge Graph (Linked Open Data) quality an
 pip install kg-qa
 ```
 
-###Get started 
+### Get started 
 How check SPARQL endpoint availability with this library:
 ```Python
 from quality_analysis import KnowledgeGraph
