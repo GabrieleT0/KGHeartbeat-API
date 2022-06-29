@@ -1,4 +1,4 @@
-# KG_QA
+# KNOWLEDGE-GRAPH-QUALITY-ANALYSIS-TOOL-API
 Library that allows you to perform Knowledge Graph (Linked Open Data) quality analysis.
 
 ### Installation
