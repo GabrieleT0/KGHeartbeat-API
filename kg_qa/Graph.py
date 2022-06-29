@@ -53,12 +53,6 @@ def getSubgraph(graph,nodeList):
     subG = graph.subgraph(nodeList)
     return subG
 
-def storeAsJSON(subG):
-    save_path = './Graphs Visualization JS'
-    completeName = os.path.join(save_path, "subGraph.json")
-    with open(completeName,'w',encoding="utf-8") as f:
-        f.write(json.dumps(json_graph.node_link_data(subG)))
-
 def storeEdges(graph,nodelist):
     save_path = './Graphs Visualization JS/Subgraphs'
     for i in range(len(nodelist)):

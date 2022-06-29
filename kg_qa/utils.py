@@ -1,4 +1,5 @@
 from copyreg import pickle
+import os
 import re
 import ssl
 import time
@@ -814,7 +815,9 @@ def binarySearch(arr,l,r,x):
 
 def checkGraphFile():
     try: #CHECK IF THE FILE WITH THE GRAPH OF KNOWLEDGE GRAPH IS PRESENT
-        graph = nx.read_gpickle('GraphOfKG.gpickle')
+        here = os.path.dirname(os.path.abspath(__file__))
+        gFile = os.path.join(here,'GraphOfKG.gpickle')
+        graph = nx.read_gpickle(gFile)
     except FileNotFoundError:   
         graph = Graph.buildGraph() #CREATION OF THE GRAPH OF KNOWLEDGE GRAPH
         nx.write_gpickle(graph,'GraphOfKG.gpickle') #STORE IT ON DISK

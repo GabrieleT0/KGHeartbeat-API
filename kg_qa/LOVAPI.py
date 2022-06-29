@@ -1,3 +1,4 @@
+import os
 from xml.dom.minidom import Notation
 import requests
 
@@ -72,12 +73,15 @@ def findVocabulary(vocab):
 @log_in_out
 def searchTermsList(terms):
     newTerms = []
-    with open('lov1.txt', 'r',encoding='utf-8') as f:
+    here = os.path.dirname(os.path.abspath(__file__))
+    lov1 = os.path.join(here,'lov1.txt')
+    lov2 = os.path.join(here,'lov2.txt')
+    with open(lov1, 'r',encoding='utf-8') as f:
         data = set(f.read().splitlines())
         for i in range(len(terms)):
             if terms[i] not in data:
                 newTerms.append(terms[i])
-    with open('lov2.txt', 'r',encoding='utf-8') as f:
+    with open(lov2, 'r',encoding='utf-8') as f:
         data = set(f.read().splitlines())
         for i in range(len(terms)):
             if terms[i] not in data:
