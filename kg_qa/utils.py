@@ -7,9 +7,9 @@ from xml.dom.minidom import Document
 import mechanize
 import requests
 import validators
-from ExternalLink import ExternalLink
+from kg_qa.ExternalLink import ExternalLink
 from kg_qa import VoIDAnalyses, aggregator,Graph
-from resources import Resources
+from kg_qa.resources  import Resources
 from kg_qa import query as q
 import networkx as nx
 
