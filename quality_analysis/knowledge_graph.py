@@ -1,13 +1,10 @@
 import datetime
-from importlib.metadata import metadata
 import json
 from os import access
 import re
-from site import execsitecustomize
 import socket
 from urllib.error import URLError
 from urllib.request import URLopener
-from matplotlib.style import available
 from numpy import source, void
 import numpy
 from rdflib import VOID, Graph as rdfG

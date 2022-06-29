@@ -1,7 +1,4 @@
-import mmap
-import re
 from xml.dom.minidom import Notation
-import rdflib
 import requests
 from rdflib import Graph
 
