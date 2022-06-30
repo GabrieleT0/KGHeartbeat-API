@@ -72,19 +72,16 @@ def findVocabulary(vocab):
 
 @log_in_out
 def searchTermsList(terms):
-    newTerms = []
     here = os.path.dirname(os.path.abspath(__file__))
     lov1 = os.path.join(here,'lov1.txt')
     lov2 = os.path.join(here,'lov2.txt')
-    with open(lov1, 'r',encoding='utf-8') as f:
-        data = set(f.read().splitlines())
-        for i in range(len(terms)):
-            if terms[i] not in data:
-                newTerms.append(terms[i])
-    with open(lov2, 'r',encoding='utf-8') as f:
-        data = set(f.read().splitlines())
-        for i in range(len(terms)):
-            if terms[i] not in data:
-                newTerms.append(terms[i])
+    newTerms = []
+    with open(lov1, 'r',encoding='utf-8') as f1:
+        with open(lov2, 'r',encoding='utf-8') as f2:
+            data1 = set(f1.read().splitlines())
+            data2 = set(f2.read().splitlines())
+            for i in range(len(terms)):
+                if terms[i] not in data1 and terms[i] not in data2:
+                    newTerms.append(terms[i])
     return newTerms
 
