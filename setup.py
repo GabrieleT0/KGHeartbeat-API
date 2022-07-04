@@ -15,7 +15,7 @@ with open(path.join(HERE, 'README.md'), encoding='utf-8') as f:
 # This call to setup() does all the work
 setup(
     name="kg-qa",
-    version="0.1.8",
+    version="0.1.1",
     description="Library that allows to perform Knowledge Graph (Linked Open Data) quality analysis.",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -36,6 +36,6 @@ setup(
     ],
     packages=["kg_qa"],
     include_package_data=True,
-    install_requires=["SPARQLWrapper"],
+    install_requires=["SPARQLWrapper>=2.0.0","networkx>=2.6.3","validators>=0.18.2","requests>=2.27.1","rdflib>=6.1.1","numpy>=1.22.2","mmh3>=3.0.0","mechanize>=0.4.7","bitarray>=2.4.0","scipy>=1.8.1"],
     package_data={'' : ['*.txt','*.gpickle']},
 )
