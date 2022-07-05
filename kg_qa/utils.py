@@ -12,6 +12,7 @@ from kg_qa import VoIDAnalyses, aggregator,Graph
 from kg_qa.resources  import Resources
 from kg_qa import query as q
 import networkx as nx
+import pickle
 
 #PRINT THE METADATI OF A KG
 def printMetadatiKG(metadct):
@@ -815,12 +816,19 @@ def binarySearch(arr,l,r,x):
 def checkGraphFile():
     try: #CHECK IF THE FILE WITH THE GRAPH OF KNOWLEDGE GRAPH IS PRESENT
         here = os.path.dirname(os.path.abspath(__file__))
-        gFile = os.path.join(here,'GraphOfKG.gpickle')
+        gFile = os.path.join(here,'GraphOfKG.gpickle') #GET PATH OF CURRENT WORKING DIRECTORY
+        infile = open(gFile,'rb')
         #graph = nx.read_gpickle(gFile)
-        pickle.load(gFile)
+        graph = pickle.load(infile)
+        infile.close
     except FileNotFoundError:   
         graph = Graph.buildGraph() #CREATION OF THE GRAPH OF KNOWLEDGE GRAPH
-        nx.write_gpickle(graph,'GraphOfKG.gpickle') #STORE IT ON DISK
+        here = os.path.dirname(os.path.abspath(__file__))
+        gFile = os.path.join(here,'GraphOfKG.gpickle') #GET PATH OF CURRENT WORKING DIRECTORY
+        outfile = open(gFile,'wb')
+        pickle.dump(graph,outfile) #STORE IT ON DISK
+        outfile.close()
+        #nx.write_gpickle(graph,'GraphOfKG.gpickle') #STORE IT ON DISK
     
     return graph
 
