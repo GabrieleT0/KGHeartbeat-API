@@ -820,7 +820,7 @@ def checkGraphFile():
         infile = open(gFile,'rb')
         #graph = nx.read_gpickle(gFile)
         graph = pickle.load(infile)
-        infile.close
+        infile.close()
     except FileNotFoundError:   
         graph = Graph.buildGraph() #CREATION OF THE GRAPH OF KNOWLEDGE GRAPH
         here = os.path.dirname(os.path.abspath(__file__))
