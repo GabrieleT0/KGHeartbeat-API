@@ -1,10 +1,8 @@
 import datetime
 import json
-from os import access
 import re
 import socket
 from urllib.error import URLError
-from urllib.request import URLopener
 from numpy import source, void
 import numpy
 from rdflib import VOID, Graph as rdfG

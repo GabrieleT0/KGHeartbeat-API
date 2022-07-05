@@ -1,6 +1,5 @@
 import datetime
 import re
-from types import NoneType
 from rdflib import DCAT, Graph, URIRef
 from rdflib.namespace import DC, DCTERMS, DOAP, FOAF, SKOS, OWL, RDF, RDFS, VOID, XMLNS, XSD
 
@@ -35,7 +34,7 @@ def getCreationDate(graph):
         if p == DCTERMS.created or DCTERMS.issued:
             o = str(o)
             match = re.search(r'\d{4}-\d{2}-\d{2}', o)
-            if not(isinstance(match,NoneType)):
+            if match is not None:
                 o = datetime.datetime.strptime(match.group(), '%Y-%m-%d').date()
                 date.append(o)
     if len(date) > 0:       
@@ -49,7 +48,7 @@ def getModificationDate(graph):
         if p == DCTERMS.modified:
             o = str(o)
             match = re.search(r'\d{4}-\d{2}-\d{2}', o)
-            if not(isinstance(match,NoneType)):
+            if match is not None:
                 o = datetime.datetime.strptime(match.group(), '%Y-%m-%d').date()
                 date.append(o)
     if len(date) > 0:       

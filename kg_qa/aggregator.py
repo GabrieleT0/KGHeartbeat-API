@@ -1,4 +1,3 @@
-from types import NoneType
 from kg_qa import DataHubAPI
 from kg_qa import LODCloudAPI
 from kg_qa import utils
@@ -95,7 +94,7 @@ def getExternalLinks(idKG):
     metadataDH = DataHubAPI.getDataPackage(idKG)
     metadataLODC = LODCloudAPI.getJSONMetadata(idKG)
     linksDH = DataHubAPI.getExternalLinks(metadataDH)
-    if linksDH == False or isinstance(linksDH,NoneType):
+    if linksDH == False or linksDH is None:
         linksDH = {}   #BECAUSE IS USED TO CLEAN THE RESULTS FROM LODCLOUD (IN CASE DATAHUB NOT HAVE EXTERNAL LINKS)
     linksLODC = LODCloudAPI.getExternalLinks(metadataLODC)
     if isinstance(linksLODC,list):
