@@ -3,7 +3,6 @@ import os
 import re
 import ssl
 import time
-from types import NoneType
 from xml.dom.minidom import Document
 import mechanize
 import requests
@@ -164,13 +163,13 @@ def getResultsFromXML(results):
         literalList = results.getElementsByTagName('literal')
         numTags = results.getElementsByTagName("literal").length
         for i in range(numTags):
-            if (not isinstance(literalList[i].firstChild,NoneType)):
+            if literalList[i].firstChild is not None:
                 literal = literalList[i].firstChild.nodeValue
                 li.append(literal)
         literalList = results.getElementsByTagName('uri')
         numTags = results.getElementsByTagName("uri").length
         for i in range(numTags):
-            if (not isinstance(literalList[i].firstChild,NoneType)):
+            if literalList[i].firstChild is not None:
                 literal = literalList[i].firstChild.nodeValue
                 li.append(literal)
         return li
@@ -181,7 +180,7 @@ def getResultsFromXMLUri(results):
         literalList = results.getElementsByTagName('uri')
         numTags = results.getElementsByTagName("uri").length
         for i in range(numTags):
-            if (not isinstance(literalList[i].firstChild,NoneType)):
+            if literalList[i].firstChild is not None:
                 literal = literalList[i].firstChild.nodeValue
                 li.append(literal)
         return li
@@ -508,12 +507,12 @@ def getUrlVoID(otResources):
     if isinstance(otResources,list):
         for i in range(len(otResources)):
             resource = otResources[i]
-            if (not isinstance(resource.format,NoneType)):
+            if resource.format is not None:
                 if resource.format == 'meta/void' and resource.status == 'active':
                     urlV = resource.url
                     if isinstance(urlV,str):
                         return urlV
-                elif (not isinstance(resource.title,NoneType)):
+                elif resource.title is not None:
                     if 'void' in resource.title and resource.status == 'active':
                         urlV = resource.url
                         if isinstance(urlV,str):
