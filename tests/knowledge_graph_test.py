@@ -1,5 +1,5 @@
 import unittest
-from quality_analysis.knowledge_graph import KnowledgeGraph
+from kg_qa.knowledge_graph import KnowledgeGraph
 
 class KnowledgeGraphTestCase(unittest.TestCase):
     
