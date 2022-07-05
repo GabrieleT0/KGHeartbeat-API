@@ -816,7 +816,8 @@ def checkGraphFile():
     try: #CHECK IF THE FILE WITH THE GRAPH OF KNOWLEDGE GRAPH IS PRESENT
         here = os.path.dirname(os.path.abspath(__file__))
         gFile = os.path.join(here,'GraphOfKG.gpickle')
-        graph = nx.read_gpickle(gFile)
+        #graph = nx.read_gpickle(gFile)
+        pickle.load(gFile)
     except FileNotFoundError:   
         graph = Graph.buildGraph() #CREATION OF THE GRAPH OF KNOWLEDGE GRAPH
         nx.write_gpickle(graph,'GraphOfKG.gpickle') #STORE IT ON DISK
