@@ -1143,3 +1143,47 @@ def getAllPropertySP(url):
             return False
     except Exception as e:
         return e
+    
+@log_in_out
+def getFP(url):
+    sparql = SPARQLWrapper(url)
+    sparql.setQuery('''
+    PREFIX owl: <http://www.w3.org/2002/07/owl#>
+    SELECT *
+    WHERE 
+    {?s owl:FunctionalProperty ?o.}
+    ''')
+    sparql.setTimeout(300)
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+    if isinstance(results,dict):
+        result = results.get('results')
+        bindings = result.get('bindings')
+        return bindings
+    elif isinstance(results,Document): 
+            bindings = utils.xmlToDictSPO(results)
+            return bindings
+    else:
+        return False
+
+@log_in_out
+def getIFP(url):
+    sparql = SPARQLWrapper(url)
+    sparql.setQuery('''
+    PREFIX owl: <http://www.w3.org/2002/07/owl#>
+    SELECT *
+    WHERE 
+    {?s owl:InverseFunctionalProperty ?o.}
+    ''')
+    sparql.setTimeout(300)
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+    if isinstance(results,dict):
+        result = results.get('results')
+        bindings = result.get('bindings')
+        return bindings
+    elif isinstance(results,Document): 
+            bindings = utils.xmlToDictSPO(results)
+            return bindings
+    else:
+        return False

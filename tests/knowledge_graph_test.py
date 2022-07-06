@@ -241,11 +241,14 @@ class KnowledgeGraphTestCase(unittest.TestCase):
     def testAccessKG(self):
         result = self.kg.getAccessAtKG()
         self.assertEqual(len(result),4)    
-
-
-
     
+    def testFP(self):
+        result = self.kg.checkFPViolations()
+        self.assertEqual(result,0)
     
+    def testIFP(self):
+        result = self.kg.checkIFPViolations()
+        self.assertEqual(result,0)
 
 if __name__ == '__main__':
     unittest.main()

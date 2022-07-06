@@ -384,6 +384,71 @@ class KnowledgeGraph:
                 return e
         else:
             return 'SPARQL endpoint absent'
+
+
+    def checkFPViolations(self):
+        '''
+        Check for functional properties with inconsistent value, analyzing all triples with predicate owl:FunctionalProperty and checking if there is any violations.
+
+        :return: Number of triples with functional property violations.
+        :rtype: int
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        if isinstance(url,str):
+            try:
+                violationFP = []
+                triplesFP = q.getFP(url)
+                for triple in triplesFP:
+                    s = triple.get('s')
+                    subject1 = s.get('value')
+                    o = triple.get('o')
+                    obj1 = o.get('value')
+                    for triple2 in triplesFP:
+                        s = triple2.get('s')
+                        subject2 = s.get('value')
+                        o = triple2.get('o')
+                        obj2 = o.get('value')
+                        if subject1 == subject2 and obj1 != obj2:
+                            violationFP.append(triple)
+                return len(violationFP)
+            except (HTTPError,URLError,SPARQLExceptions.EndPointNotFound,socket.gaierror,SPARQLExceptions.EndPointInternalError,json.JSONDecodeError, SPARQLExceptions.QueryBadFormed,SPARQLExceptions.Unauthorized):
+                return 'SPARQL endpoint offline'
+            except Exception as e:
+                return e
+        else:
+            return 'SPARQL endpoint absent'
+        
+    def checkIFPViolations(self):
+        '''
+        Check for invalid usage of inverse-functional properties, analyzing all triples with predicate owl:InverseFunctionalProperty and checking if there is any violations. 
+        
+        :return: Number of triples with inverse-functional properties violations.
+        :rtype: int
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        if isinstance(url,str):
+            try:
+                violationIFP = []
+                triplesIFP = q.getIFP(url)
+                for triple in triplesIFP:
+                    s = triple.get('s')
+                    subject1 = s.get('value')
+                    o = triple.get('o')
+                    obj1 = o.get('value')
+                    for triple2 in triplesIFP:
+                        s = triple2.get('s')
+                        subject2 = s.get('value')
+                        o = triple2.get('o')
+                        obj2 = o.get('value')
+                        if obj1 == obj2 and subject1 != subject2:
+                            violationIFP.append(triple)
+                return len(violationIFP)
+            except (HTTPError,URLError,SPARQLExceptions.EndPointNotFound,socket.gaierror,SPARQLExceptions.EndPointInternalError,json.JSONDecodeError, SPARQLExceptions.QueryBadFormed,SPARQLExceptions.Unauthorized):
+                return 'SPARQL endpoint offline'
+            except Exception as e:
+                return e
+        else:
+            return 'SPARQL endpoint absent'
         
     #CONSISTENCY    
     
