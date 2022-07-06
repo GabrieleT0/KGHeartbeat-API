@@ -770,7 +770,7 @@ class KnowledgeGraph:
         Get the description of the KG by analyzing the metadata.
 
         :return: description of KG.
-        rtype: str
+        :rtype: str
         '''
         metadata = aggregator.getDataPackage(self.id)
         description = aggregator.getDescription(metadata)
