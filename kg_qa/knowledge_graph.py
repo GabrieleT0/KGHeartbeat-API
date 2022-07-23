@@ -7,6 +7,7 @@ from numpy import source, void
 import numpy
 from rdflib import VOID, Graph as rdfG
 from requests import HTTPError
+import requests
 from kg_qa import aggregator
 from kg_qa import query as q
 from kg_qa import utils,VoIDAnalyses,Graph,LOVAPI
@@ -81,6 +82,56 @@ class KnowledgeGraph:
                 inactiveLink = True
         
         return inactiveLink
+    
+    def getURIsDef(self):
+        '''
+        Check the URIs deferenceability. This test is done based on 5000 triples retrieved randomly from the SPARQL endpoint, and for each triple a GET requests is performed.
+
+        :return: A value which is the ratio between: number of deferenceable URIs and number of total URIs considered.
+        :rtype: float
+        '''
+        url = aggregator.getSPARQLEndpoint(self.id)
+        try:
+            defCount = 0
+            uriCount = 0
+            uris = q.getUris(url) #QUERY THAT GET 5000 RANDOM URI FROM THE ENDPOINT 
+            for uri in uris:
+                if utils.checkURI(uri) == True:
+                    uriCount = uriCount + 1
+                    try:
+                        response = requests.get(uri,headers={"Accept":"application/rdf+xml"},stream=True)
+                        if response.status_code == 200:
+                            defCount = defCount +1
+                    except:
+                        continue
+            if uriCount > 0:        
+                defValue = defCount / uriCount
+            else:
+                defValue = 'No uri retrieved from the endpoint'
+        except: #IF QUERY FAILS (BECUASE SPARQL 1.1 IS NOT SUPPORTED) TRY TO CHECK THE DEFERETIABILITY BY FILTERING THE TRIPLES RECOVERED FOR OTHER CALCULATION (IF THEY ARE BEEN RECOVERED)
+            try:
+                uriCount = 0
+                defCount = 0
+                allTriples = q.getAllTriplesSPO(url)
+                for i in range(5000):
+                    s = allTriples[i].get('s')
+                    value = s.get('value')
+                    if utils.checkURI(value):
+                        uriCount = uriCount + 1
+                        try:
+                            response = requests.get(value,headers={"Accept":"application/rdf+xml"},stream=True)
+                            if response.status_code == 200:
+                                defCount = defCount +1
+                        except:
+                            continue
+                if uriCount > 0:
+                    defValue = defCount / uriCount
+                else:
+                    defValue = 'No uri found'
+            except:
+                defValue = 'Could not process formulated query on indicated endpoint'
+        
+        return defValue
     
     #LICENSING
 

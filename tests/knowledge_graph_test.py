@@ -17,6 +17,11 @@ class KnowledgeGraphTestCase(unittest.TestCase):
     def testInactiveL(self):
         result = self.kg.checkInactiveLinks()
         self.assertEqual(result,True)
+
+    def testDefValue(self):
+        result = self.kg.getURIsDef()
+        print(result)
+        self.assertEqual(type(result),float)
     
     def testLicenseMR(self):
         result = self.kg.getLicenseMR()

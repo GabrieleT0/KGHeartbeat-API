@@ -1187,3 +1187,27 @@ def getIFP(url):
             return bindings
     else:
         return False
+
+@log_in_out
+def getUris(url):
+    sparql = SPARQLWrapper(url)
+    sparql.setQuery('''
+    SELECT DISTINCT ?s
+    WHERE {
+    ?s ?p ?o
+    FILTER(isIRI(?s))
+    }
+    ORDER BY RAND()
+    LIMIT 5000
+    ''')
+    sparql.setTimeout(300)
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+    if isinstance(results,dict):
+        uriList = utils.getResultsFromJSONs(results)
+        return uriList
+    elif isinstance(results,Document):
+        uriList = utils.getResultsFromXML(results)
+        return uriList
+    else:
+        return False
