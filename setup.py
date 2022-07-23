@@ -15,11 +15,11 @@ with open(path.join(HERE, 'README.md'), encoding='utf-8') as f:
 # This call to setup() does all the work
 setup(
     name="kg-qa",
-    version="0.1.6",
+    version="0.1.7",
     description="Library that allows to perform Knowledge Graph (Linked Open Data) quality analysis.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://kg-qa.readthedocs.io/",
+    url="https://knowledge-graph-quality-analysis-api.readthedocs.io/",
     author="Gabriele Tuozzo, Maria Angela Pellegrino",
     author_email="gabrieletuozzo@gmail.com",
     license="MIT",
