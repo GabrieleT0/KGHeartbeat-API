@@ -11,7 +11,7 @@ How check SPARQL endpoint availability with this library:
 ```Python
 from kg_qa import KnowledgeGraph
 
-# Instanziate a KnowledgeGraph object, passing the id of the kg to be analyzed
+# Instanziate a KnowledgeGraph class, passing the id of the kg to be analyzed
 kg = KnowledgeGraph('dbpedia')
 
 # Call the check availability enpoint method
