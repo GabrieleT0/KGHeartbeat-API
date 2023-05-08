@@ -1,6 +1,6 @@
 from os import access
-from kg_qa import query as q
-from kg_qa import utils
+from kgheartbeat import query as q
+from kgheartbeat import utils
 
 def checkEndpoindAv(url):
     '''

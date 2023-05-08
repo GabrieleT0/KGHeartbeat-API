@@ -2,9 +2,9 @@ import json
 import os
 import string
 import networkx as nx
-from kg_qa import AGAPI
-from kg_qa import aggregator
-from kg_qa import utils
+from kgheartbeat import AGAPI
+from kgheartbeat import aggregator
+from kgheartbeat import utils
 import re
 
 def buildGraph():

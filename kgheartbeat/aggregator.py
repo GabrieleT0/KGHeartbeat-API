@@ -1,6 +1,6 @@
-from kg_qa import DataHubAPI
-from kg_qa import LODCloudAPI
-from kg_qa import utils
+from kgheartbeat import DataHubAPI
+from kgheartbeat import LODCloudAPI
+from kgheartbeat import utils
 
 def getDataPackage(idKG):
     metadataDH = DataHubAPI.getDataPackage(idKG)

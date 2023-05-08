@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'Knowledge Graph quality analysis API'
+project = 'KGHeartbeat API'
 copyright = '2022, Gabriele Tuozzo and Maria Angela Pellegrino'
 author = 'Gabriele Tuozzo and Maria Angela Pellegrino'
 

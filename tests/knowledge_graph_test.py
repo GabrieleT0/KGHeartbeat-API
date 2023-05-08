@@ -1,5 +1,5 @@
 import unittest
-from kg_qa.knowledge_graph import KnowledgeGraph
+from kgheartbeat.knowledge_graph import KnowledgeGraph
 
 class KnowledgeGraphTestCase(unittest.TestCase):
     

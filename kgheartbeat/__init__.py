@@ -1,0 +1,1 @@
+from kgheartbeat.knowledge_graph import KnowledgeGraph

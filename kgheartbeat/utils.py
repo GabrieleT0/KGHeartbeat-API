@@ -7,10 +7,10 @@ from xml.dom.minidom import Document
 import mechanize
 import requests
 import validators
-from kg_qa.ExternalLink import ExternalLink
-from kg_qa import VoIDAnalyses, aggregator,Graph
-from kg_qa.resources  import Resources
-from kg_qa import query as q
+from kgheartbeat.ExternalLink import ExternalLink
+from kgheartbeat import VoIDAnalyses, aggregator,Graph
+from kgheartbeat.resources  import Resources
+from kgheartbeat import query as q
 import networkx as nx
 import pickle
 

@@ -8,12 +8,12 @@ import numpy
 from rdflib import VOID, Graph as rdfG
 from requests import HTTPError
 import requests
-from kg_qa import aggregator
-from kg_qa import query as q
-from kg_qa import utils,VoIDAnalyses,Graph,LOVAPI
+from kgheartbeat import aggregator
+from kgheartbeat import query as q
+from kgheartbeat import utils,VoIDAnalyses,Graph,LOVAPI
 from SPARQLWrapper import SPARQLExceptions
-from kg_qa.bloomfilter import BloomFilter
-from kg_qa.sources import Sources
+from kgheartbeat.bloomfilter import BloomFilter
+from kgheartbeat.sources import Sources
 
 class KnowledgeGraph:
     '''

@@ -3,13 +3,13 @@ Library that allows you to perform Knowledge Graph (Linked Open Data) quality an
 
 ### Installation
 ```
-pip install kg-qa
+pip install kgheartbeat
 ```
 
 ### Get started 
 How check SPARQL endpoint availability with this library:
 ```Python
-from kg_qa import KnowledgeGraph
+from kgheartbeat import KnowledgeGraph
 
 # Instanziate a KnowledgeGraph class, passing the id of the kg to be analyzed
 kg = KnowledgeGraph('dbpedia')

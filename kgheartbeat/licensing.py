@@ -1,4 +1,4 @@
-from kg_qa import query as q
+from kgheartbeat import query as q
 
 def getLicenseMR(url):
     '''
