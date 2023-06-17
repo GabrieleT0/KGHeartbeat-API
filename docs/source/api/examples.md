@@ -2,7 +2,7 @@
 # Examples
 ---
 
-All of the following examples assume that the library has been installed with the following command
+All of the following examples assume that the library has been installed with the following command.
 
 ```sh
 pip install kgheartbeat
