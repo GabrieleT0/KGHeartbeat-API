@@ -1,5 +1,5 @@
 ---
-Examples
+# Examples
 ---
 
 All of the following examples assume that the library has been installed with the following command
@@ -7,7 +7,7 @@ All of the following examples assume that the library has been installed with th
 ```sh
 pip install kgheartbeat
 ```
-# Calculate the *Availability* dimension
+## Calculate the *Availability* dimension
 This example show how calculate the availability of a KG, we need to calculate all the metrics connected to them. Suppose we want to calculate the availability for DBpedia.
 
 ```py
@@ -32,7 +32,7 @@ print(f"SPARQL endpoint availability: {sparqlAv}\n \
        URIs deferenceability: {uriDef}")
 ```
 
-# Calculate the *Licensing* dimension
+## Calculate the *Licensing* dimension
 In this example we want to calculate the *licensing* dimension for Taxref-ld 
 
 ```py
@@ -49,7 +49,7 @@ hr_license = kg.getLicenseHR()
 print(f"Machine redeable license: {mr_license}\nHuman-redeable license: {hr_license}")
 ```
 
-# Calculate the *Versatility* dimension
+## Calculate the *Versatility* dimension
 This is another example, in which we demostrate how calculate all the metric in the *Versatility* dimension.
 
 ```py
