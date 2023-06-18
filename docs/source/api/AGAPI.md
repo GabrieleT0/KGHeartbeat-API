@@ -1,4 +1,4 @@
-# <kbd>module</kbd> `AGAPIh.py`
+# <kbd>module</kbd> `AGAPI.py`
 ============
 
 Functions
