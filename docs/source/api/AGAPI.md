@@ -1,4 +1,4 @@
-Module AGAPI
+# <kbd>module</kbd> `knowledge_graph.py`
 ============
 
 Functions
