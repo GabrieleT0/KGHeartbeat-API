@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Knowledge Graph quality analysis API's documentation!
+Welcome to KGHearthbeat API's documentation!
 ================================================================
 
 .. toctree::
@@ -15,10 +15,16 @@ Welcome to Knowledge Graph quality analysis API's documentation!
    :caption: Python API: 
    
    api/knowledge_graph
+   api/AGAPI
+   api/aggregator
+   
 
 .. toctree::
    :maxdepth: 2
    :caption: Extra:
+   
+   
+   api/examples
 
 
 Indices and tables
