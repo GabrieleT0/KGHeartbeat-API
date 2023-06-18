@@ -15,11 +15,15 @@ Welcome to KGHearthbeat API's documentation!
    :caption: Python API: 
    
    api/knowledge_graph
-   api/examples
+   api/AGAPI
+   
 
 .. toctree::
    :maxdepth: 2
    :caption: Extra:
+   
+   
+   api/examples
 
 
 Indices and tables
