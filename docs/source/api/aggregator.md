@@ -1,4 +1,4 @@
-Module aggregator
+# <kbd>module</kbd> `aggregator.py`
 =================
 
 Functions
