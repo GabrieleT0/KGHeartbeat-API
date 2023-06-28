@@ -1,8 +1,8 @@
 # <kbd>module</kbd> `DataHubAPI.py`
-=================
+---
 
 Functions
----------
+---
 
 
 `checkRDFDump(jsonFile)`

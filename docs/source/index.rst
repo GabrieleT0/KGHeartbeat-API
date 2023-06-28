@@ -20,6 +20,7 @@ Welcome to KGHearthbeat API's documentation!
    api/DataHubAPI
    api/Graph
    api/LODCloudAPI
+   api/LOVAPI
 
 .. toctree::
    :maxdepth: 2

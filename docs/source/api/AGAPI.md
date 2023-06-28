@@ -1,8 +1,8 @@
 # <kbd>module</kbd> `AGAPI.py`
-============
+---
 
 Functions
----------
+---
 
 
 `getAllKg()`

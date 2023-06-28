@@ -1,8 +1,7 @@
 # <kbd>module</kbd> `aggregator.py`
-=================
-
+---
 Functions
----------
+---
 
 
 `getAuthor(metadata)`

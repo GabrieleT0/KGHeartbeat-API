@@ -1,8 +1,8 @@
 # <kbd>module</kbd> `LODCloudAPI.py`
-==================
+---
 
 Functions
----------
+---
 
     
 `getAuthor(jsonFile)`
