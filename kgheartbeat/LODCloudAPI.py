@@ -1,6 +1,38 @@
 import requests
 
+"""
+This module is used to extract the metadata for a particular KG from DataHub (https://old.datahub.io/). 
+
+Examples:
+    >>> from kgheartbeat import LODCloudAPI
+    >>> LODCloudAPI.getJSONMetadata('dbpedia')
+
+This module contains the following functions:
+
+- `getJSONMetadata(idKG)` - Returns a JSON with all the metadata of the KG.
+- `getNameKG(metadata)` -  Find the KG name in the metadata.
+- `getLicense(jsonFile)` - Find the license in the metadata.
+- `getAuthor(jsonFile)` - Find the KG author in the metadata.
+- `getSource(jsonFile)` - Returns all sources related to the KG (e.g. email, name, website).
+- `getSourceDict(jsonFile)` - Returns a dict with all sources related to the KG (e.g. email, name, website).
+- `getOtherResources(jsonFile)` - Returns all other resources related to the KG (e.g. example of SPARQL query).
+- `getTriples(jsonFile)` - Get the number of triples in the KG indicated in the metadata.
+- `getSPARQLEndpoint(jsonFile)` - Returns the SPARQL endpoint of the KG from its ID.
+- `getExternalLinks(jsonFile)` - Returns the KGs with which the KG is connected.
+- `getDescription(jsonFile)` - Returns the description of KG from its metadata.
+- `getKeywords(jsonFile)` - Returns all the keyword related with the KG.
+
+"""
+
 def getJSONMetadata(idKG):
+    """Get the JSON file with all matadata about the KG from its id.
+    
+    Args:
+        idKG (string): A string that represent the ID of KG that we want to fetch the metadata.
+    
+    Returns:
+        dict: A dict that contains all the metadata of the KG.
+    """
     url = 'https://lod-cloud.net/json/%s'%idKG
     try:
         response = requests.get(url)
@@ -15,6 +47,14 @@ def getJSONMetadata(idKG):
         return False
 
 def getNameKG(metadata):
+    """Get the KG name form the kg metadata.
+
+    Args:
+        metadata (dict): A dict that contains all KG metadata.
+
+    Returns:
+        string: A string that represent the KG name
+    """
     if isinstance(metadata,dict):
         title = metadata.get('title')
         return title
@@ -22,6 +62,15 @@ def getNameKG(metadata):
         return False
 
 def getLicense(jsonFile):
+    """
+    Get the license info from the metadata recovered.
+
+    Args:
+        jsonFile (dict): A dict that contains all KG metadata.
+
+    Returns:
+        string: A string that represent the KG license.
+    """
     if isinstance(jsonFile,dict):
         license = jsonFile.get('license')
         if (not license):
@@ -32,6 +81,14 @@ def getLicense(jsonFile):
         return False
 
 def getAuthor(jsonFile):
+    """Get the KG author from the KG metadata.
+
+    Args:
+        jsonFile (dict): A dict that contains all KG metadata.
+
+    Returns:
+        string: A string that represent the KG author.
+    """
     if isinstance(jsonFile,dict):
         owner = jsonFile.get('owner')
         if isinstance(owner,dict):
@@ -49,6 +106,14 @@ def getAuthor(jsonFile):
         return False
 
 def getSource(jsonFile):
+    """Get the KG source from the KG metadata.
+
+    Args:
+        jsonFile (dict): A dict that contains all KG metadata.
+
+    Returns:
+        dict: A dict that contains all info about the KG source.
+    """
     if isinstance(jsonFile,dict):
         website = jsonFile.get('website')
         if(not website):
@@ -70,6 +135,14 @@ def getSource(jsonFile):
 
         
 def getSourceDict(jsonFile):
+    """Get the KG source from the KG metadata.
+
+    Args:
+        jsonFile (dict): A dict that contains all KG metadata.
+
+    Returns:
+        dict: A dict that contains all info about the KG source.
+    """
     if isinstance(jsonFile,dict):
         website = jsonFile.get('website')
         if(not website):
@@ -84,6 +157,14 @@ def getSourceDict(jsonFile):
         return False
 
 def getOtherResources(jsonFile):  
+    """Get all the other resources related with the KG (e.g. examples of SPARQL query) and delete the duplicate links.
+
+    Args:
+        jsonFile (dict): A dict which contains all the KG metadata.
+
+    Returns:
+        list: A list of dict that contains all the links to other resources.
+    """
     if isinstance(jsonFile,dict):
         fullDownload = []
         example = []
@@ -109,6 +190,14 @@ def getOtherResources(jsonFile):
         return False
 
 def getTriples(jsonFile):
+    """Get the number of KG triples indicated in the metadata.
+
+    Args:
+        jsonFile (dict): A dict which contains all KG metadata.
+
+    Returns:
+        int: An integer that is the number of triples in the KG.
+    """
     if isinstance(jsonFile,dict):
         triples = jsonFile.get('triples',0)
         return triples
@@ -116,6 +205,13 @@ def getTriples(jsonFile):
         return False
 
 def getSPARQLEndpoint(jsonFile):
+    """Get the SPARQL endpoint from the KG metadata.    
+    Args:
+        jsonFile (dict): A dict which contains all the KG metadata.
+
+    Returns:
+        string: A string that is the SPARQL endpoint link.
+    """
     if isinstance(jsonFile,dict):
         listSparql = jsonFile.get('sparql')
         if isinstance(listSparql,list):
@@ -131,6 +227,14 @@ def getSPARQLEndpoint(jsonFile):
         return False
 
 def getExternalLinks(jsonFile):
+    """Get all the external links related to the KG.
+    
+    Args:
+        jsonFile (jsonFile): A dict which contains all the metadata of the KH.
+
+    Returns:
+        dict: A dict which contains the links and the info about the links.
+    """
     if isinstance(jsonFile,dict):
         links = jsonFile.get('links',0)
         if isinstance(links,list):
@@ -141,6 +245,13 @@ def getExternalLinks(jsonFile):
         return False
 
 def getDescription(jsonFile):
+    """Get the KG description.
+    Args:
+        jsonFile (dict): A dict that contains the KG metadata.
+
+    Returns:
+        string: A string that is the description of the data in the KG.
+    """
     if isinstance(jsonFile,dict):
         en = jsonFile.get('description','absent')
         if isinstance(en,dict):
@@ -152,6 +263,13 @@ def getDescription(jsonFile):
         return False
 
 def getKeywords(jsonfile):
+    """Get the KG keyowords.
+    Args:
+        jsonFile (dict): A dict which contains all the KG metadata.
+
+    Returns:
+        string: A string that is the concatenation of all the KG keywords.
+    """
     if isinstance(jsonfile,dict):
         keywords = jsonfile.get('keywords')
         return keywords

@@ -29,7 +29,7 @@ def getDataPackage(idDataset):
     """Get the JSON file with all matadata about the KG from its id.
     
     Args:
-        idDatasst (string): A string that represent the ID of KG that we want to fetch the metadata.
+        idDataset (string): A string that represent the ID of KG that we want to fetch the metadata.
     
     Returns:
         dict: A dict that contains all the metadata of the KG.
@@ -131,7 +131,7 @@ def getOtherResources(jsonFile):
         jsonFile (dict): A dict which contains all the KG metadata.
 
     Returns:
-        list: A list that contains all the links to other resources.
+        list: A list of dict that contains all the links to other resources.
     """
     if isinstance(jsonFile,dict):
         resources = []
