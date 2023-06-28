@@ -17,6 +17,7 @@ Welcome to KGHearthbeat API's documentation!
    api/knowledge_graph
    api/AGAPI
    api/aggregator
+   api/DataHubAPI
    
 
 .. toctree::

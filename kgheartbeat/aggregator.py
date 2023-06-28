@@ -18,12 +18,12 @@ This module contains the following functions:
 - `getAuthor(metadata)` - Find the KG author in the metadata.
 - `getSource(metadata)` -  Find any source from the metadata.
 - `getTriples(metadata)` - Returns the number of KG triples indicated in the medatada. 
--  getSPARQLEndpoint(idKG) - Returns the SPARQL endpoint of the KG from its ID, by searching on both LODC and DataHUB.
--  getOtherResources(idKG) - Returns all other resources related to the KG (e.g. example of SPARQL query).
--  getExternalLinks(idKG) -  Returns all links related to the KG (e.g. ant rdf dump link available).
--  getDescription(metadata) - Returns the description of KG from its metadata.
--  getExtrasLanguage(idKg) - Returns languages supported by the KG indicated in the metadata.
--  getKeywords(idKg) - Returns all the keyword related with the KG.
+-  `getSPARQLEndpoint(idKG)` - Returns the SPARQL endpoint of the KG from its ID, by searching on both LODC and DataHUB.
+-  `getOtherResources(idKG)` - Returns all other resources related to the KG (e.g. example of SPARQL query).
+-  `getExternalLinks(idKG)` -  Returns the KG with which the KG is connected, merging the ones indicated on LODC with the ones indicated in DataHub (if is different).
+-  `getDescription(metadata)` - Returns the description of KG from its metadata.
+-  `getExtrasLanguage(idKg)` - Returns languages supported by the KG indicated in the metadata.
+-  `getKeywords(idKg)` - Returns all the keyword related with the KG.
 
 """
 
@@ -168,7 +168,7 @@ def getOtherResources(idKG):
         idKG (string): A string that contains the KG id.
 
     Returns:
-        list: A list that contains all the links to other resources.
+        list: A list which contains all the links to other resources.
     """
     metadataDH = DataHubAPI.getDataPackage(idKG)
     metadataLODC = LODCloudAPI.getJSONMetadata(idKG)
@@ -188,7 +188,7 @@ def getExternalLinks(idKG):
         idKG (string): A string that contains the KG id.
 
     Returns:
-        dict: A dict that contains the links and the info about the links.
+        dict: A dict that which the links and the info about the links.
     """
     metadataDH = DataHubAPI.getDataPackage(idKG)
     metadataLODC = LODCloudAPI.getJSONMetadata(idKG)
