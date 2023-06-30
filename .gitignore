@@ -361,6 +361,7 @@ cython_debug/
 
 _static/
 _templates/
+mkdocs-documentation/
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can

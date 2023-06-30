@@ -15,14 +15,82 @@ from SPARQLWrapper import SPARQLExceptions
 from kgheartbeat.bloomfilter import BloomFilter
 from kgheartbeat.sources import Sources
 
-class KnowledgeGraph:
-    '''
-    Instanziate a KG by id.
-    All information for analysis is recovered from the id.
+"""
+This class is used to instanziate a KG by id. All information for analysis is recovered from the id.
 
-    :param idKG: The Knowledge Graph id.
-    :type idKG: str
-    '''
+Examples:
+    >>> from knowledge_graph import KnowledgeGraph 
+    >>> kg = KnowledgeGraph('dbpedia)
+    >>> print(kg.checkEndpointAv())
+
+This class include the following methods:
+
+- `checkEndpointAv(self)` - Check the SPARQL endpoint availability.
+- `checkDownload(self)` - Check the availability of the RDF dump.
+- `checkInactiveLinks(self)` - Check if there are any inactive links.
+- `getURIsDef(self)` - Check the URIs deferenceability.
+- `getLicenseMR(self)` - Return the machine-redeable license of the KG.
+- `getLicenseMR(self)` - Get the human-redeable license of the KG.
+- `getDegreeOfConnection(self)` -  Get the degree of connection of kg in the graph constructed with all the kg discoverable.
+- `getLicenseMR(self)` - Get the human-redeable license of the KG.
+- `getClusteringCoefficient(self)` - Get the clustering coefficient of kg in the graph constructed with all the kg discoverable.
+- `getCentrality(self)` - Get the centrality of kg in the graph constructed with all the kg discoverable.
+- `getSameAsChains(self)` - Return the number of sameAs chains, counting the triples with the predicate equal to owl:sameAs.
+- `getExternalProvider(self)` - Return a dict with all external provider.
+- `getcheckAuth(self)` - Check if authentication is required to do SPARQL query.
+- `checkHTTPS(self)` - Check if data exchange on the SPARQL endpoint takes place on HTTPS protocol.
+- `getLatency(self)` - Get the latency of the SPARQL endpoint.
+- `getThroughput(self)` - Get the throughput of the SPARQL endpoint.
+- `checkEmptyLabel(self)` - Count the number of empty label (if any) in the dataset.
+- `checkWhiteSpace(self)` - Count the number of label that have a whitespace at the beginning or at the end..
+- `checkDatatypeProblem(self)` - Count the number of literal that do not match the data type indicated
+- `checkFPViolations(self)` - Check for functional properties with inconsistent value.
+- `checkIFPViolations(self)` - Check for invalid usage of inverse-functional properties.
+- `getDisjointValue(self)` - Get the disjoint value.
+- `getUndefinedClass(self)` - Get the classes used without declaration.
+- `getUndefinedProp(self)` - Get the properties used without declaration.
+- `checkDeprecatedClassesProp(self)` - Check if deprecated classes and properties are used in the KG.
+- `checkOntologyHijacking(self)` - Check for the ontology hijacking problem.
+- `checkMisplacedClasses(self)` - Check if the classes are used incorrectly.
+- `checkMisplacedProperty(self)` - Check if the properties are used incorrectly.
+- `getIntensionalConc(self)` - Get the intensional conciseness value.
+- `getPageRank(self)` - Get the pagerank of KG based on the graph constructed with all the kg discoverable.
+- `getName(self)` - Get the title of the KG by analyzing the metadata..
+- `getDescription(self)` - Get the description of the KG by analyzing the metadata.
+- `getUri(self)` - Get the URI of the KG by analyzing the metadata.
+- `calculateTrustValue(self)` -  Calculate the trust value of the KG. It is a value between -1 and 1.
+- `getVocabularies(self)` - Get all the vocabularies used in the KG.
+- `getAuthors(self)` - Get all KG authors.
+- `getPublishers(self)` - Get all the KG pubilshers.
+- `getContributors(self)` - Get all the KG contributors.
+- `getSources(self)` - Get the KG sources.
+- `checkSign(self)` - Check if the KG is signed.
+- `getCreationDate(self)` - Get the KG creation date.
+- `getModificationDate(self)` - Get the KG modification date.
+- `getPercentageUpData(self)` - Get the percentage of updated data
+- `getLastUp(self)` - Get the elapsed time since the last modification (in days).
+- `getFrequencyUp(self)` - Get the KG update frequency.
+- `getInterlinkingComp(self)` - Calcuate the interlinking completeness
+- `getNumTriples(self)` -  Get the number of triples in the KG.
+- `getNumEntities(self)` - Count the number of entities in the dataset.
+- `getNumProperty(self)` - Get the number of property in the KG.
+- `getUriLenghtSub(self)` -  Get the uri's length in the subject position.
+- `getUriLenghtObj(self)` -  Get the uri's length in the object position.
+- `getUriLenghtPr(self)` - Get the uri's length in the predicate position.
+- `checkReuseTerms(self)` - Check usage of existing terms.
+- `checkReuseVocabs(self)` - Get the uri's length in the predicate position.
+- `getNumLabels(self)` - Count the number of label on the triples in the KG. This count is done by using a query on the SPARQL endpoint.
+- `getRegex(self)` - Return the uri regex of the KG.
+- `checkExample(self)` - Check if query examples are provided with the KG.
+- `getNumbBN(self)` - Get the blank node number.
+- `getSerializationFormat(self)` - Get the KG serialization formats.
+- `getLanguages(self)` - Get the languages supported by the KG.
+- `getAccessAtKG(self)` - Get the ways in which you can access the KG.
+
+"""
+
+
+class KnowledgeGraph:
 
     def __init__(self,id):
         self.id = id
@@ -30,12 +98,11 @@ class KnowledgeGraph:
     #AVAILABILITY
     
     def checkEndpointAv(self):
-        '''
-        Check the SPARQL endpoint availability.
+        """Check the SPARQL endpoint availability.
         
-        :return: The SPARQL endpoint availability.
-        :rtype: bool
-        '''
+        Returns:
+            bool: A boolean that represent the SPARQL endpoint availability (True = Online and False = Offline).
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         try:
             result = q.checkEndPoint(url)
@@ -54,12 +121,13 @@ class KnowledgeGraph:
         return available
     
     def checkDownload(self):
-        '''
+        """
         Check if the link for download the KG as rdf dump is present and online.
 
-        :return: The availability of rdf dump.
-        :rtype: bool
-        '''
+        Returns:
+            bool: A boolean that represent the dump link availability (True = Online and False = Offline). 
+            
+        """
         resources = aggregator.getOtherResources(self.id)
         resources = utils.insertAvailability(resources)
         available = utils.checkAvailabilityForDownload(resources)
@@ -67,12 +135,12 @@ class KnowledgeGraph:
         return available
     
     def checkInactiveLinks(self):
-        '''
+        """
         Check if there are inactive link associated with the KG.
 
-        :return: The availability of links.
-        :rtype: bool
-        '''
+        Returns:
+            bool: A boolean that represent if there are any inactive links associeted with the KG.
+        """
         resources = aggregator.getOtherResources(self.id)
         resources = utils.insertAvailability(resources)
         resourcesObj = utils.toObjectResources(resources)
@@ -84,12 +152,13 @@ class KnowledgeGraph:
         return inactiveLink
     
     def getURIsDef(self):
-        '''
+        """
         Check the URIs deferenceability. This test is done based on 5000 triples retrieved randomly from the SPARQL endpoint, and for each triple a GET requests is performed.
 
-        :return: A value which is the ratio between: number of deferenceable URIs and number of total URIs considered.
-        :rtype: float
-        '''
+        Returns:
+            float: A float that represent a value which is the ratio between: number of deferenceable URIs and number of total URIs considered.
+
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         try:
             defCount = 0
@@ -136,12 +205,12 @@ class KnowledgeGraph:
     #LICENSING
 
     def getLicenseMR(self):
-        '''
+        """
         Return the machine-redeable license of the kg, checking on the SPARQL endpopint, in the metadata and in the void file .
         
-        :return: machine-redeable license.
-        :rtype: str
-        '''
+        Returns:
+            string: A string that represent the machine-redeable license of the KG.
+        """
         metadata = aggregator.getDataPackage(self.id)
 
         licenseM = aggregator.getLicense(metadata) #CHECKING IN THE METADATA
@@ -175,12 +244,12 @@ class KnowledgeGraph:
                 return licenseV
 
     def getLicenseHR(self):
-        '''
+        """
         Get the human-redeable license, search for a label on the triples in the KG.
 
-        :return: human-redeable license.
-        :rtype: list
-        '''
+        Returns:
+            list: A list which contain all the human-redeable license founded in the KG.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         try:
             license = q.checkLicenseHR(url)
@@ -192,25 +261,25 @@ class KnowledgeGraph:
     #INTERLINKING
 
     def getDegreeOfConnection(self):
-        '''
+        """
         Get the degree of connection of kg in the graph constructed with all the kg discoverable.
         At the first call of a function of the interlinking metric a file is created in the directory which contains the graph with all kg discoverable, this is to avoid the construction of the graph every time from scratch.
         
-        :return: degree of connection.
-        :rtype: int
-        '''
+        Returns: 
+            int: An integer that represent the degree of connection.
+        """
         graph = utils.checkGraphFile()
         degree = Graph.getDegreeOfConnection(graph,self.id)
         return degree
     
     def getClusteringCoefficient(self):
-        '''
+        """
         Get the clustering coefficient of kg in the graph constructed with all the kg discoverable.
         At the first call of a function of the interlinking metric a file is created in the directory which contains the graph with all kg discoverable, this is to avoid the construction of the graph every time from scratch.
         
-        :return: local clustering coeffcient.
-        :rtype: float
-        '''
+        Returns:
+            float: A float that represent a local clustering coefficient.
+        """
         graph = utils.checkGraphFile()
         lcc = Graph.getClusteringCoefficient(graph,self.id)
         lcc = "%.3f"%lcc
@@ -218,13 +287,13 @@ class KnowledgeGraph:
         return float(lcc)
     
     def getCentrality(self):
-        '''
+        """
         Get the centrality of kg in the graph constructed with all the kg discoverable.
         At the first call of a function of the interlinking metric a file is created in the directory which contains the graph with all kg discoverable, this is to avoid the construction of the graph every time from scratch.
         
-        :return: centrality.
-        :rtype: float
-        '''
+        Returns:
+            float: A float that is the centrality of the KG.
+        """
         graph = utils.checkGraphFile()
         centrality = Graph.getCentrality(graph,self.id)
         centratility = "%.3f"%centrality
@@ -232,12 +301,12 @@ class KnowledgeGraph:
         return float(centrality)
 
     def getSameAsChains(self):
-        '''
+        """
         Return the number of sameAs chains, counting the triples with the predicate equal to owl:sameAs.
-
-        :return: number of sameAs chains.
-        :rtype: int
-        '''
+        
+        Returns:
+            int: A integer that is the number of sameAs chains.
+        """
         try:
             url = aggregator.getSPARQLEndpoint(self.id)
             if isinstance(url,str):
@@ -252,12 +321,12 @@ class KnowledgeGraph:
         return numSameAs
 
     def getExternalProvider(self):
-        '''
+        """
         Return a dict with all external provider the key is the id of the KG it is connected to and the value is the number of triples connected, this information is obtained by analyzing the metadata.
 
-        :return: external provider dictonary.
-        :rtype: dict
-        '''
+        Returns:
+            dict: A dict with all external provider.
+        """
 
         extLinks = aggregator.getExternalLinks(self.id)
 
@@ -266,12 +335,12 @@ class KnowledgeGraph:
     #SECURITY
     
     def checkAuth(self):
-        '''
+        """
         Check if authentication is required to do SPARQL query on the endpoint.
 
-        :return: True if authentication is required, False otherwise.
-        :rtype: bool
-        '''
+        Returns:
+            bool: A boolean that is True if authentication is required, False otherwise.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -285,12 +354,12 @@ class KnowledgeGraph:
             return 'SPARQL endpoint absent'
     
     def checkHTTPS(self):
-        '''
+        """
         Check if data exchange on the SPARQL endpoint takes place on HTTPS protocol.
 
-        :return: True if HTTPS is used, False otherwise.
-        :rtype: bool
-        '''
+        Returns:
+            bool: A boolean that is True if HTTPS is used, Flase otherwise.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -309,13 +378,13 @@ class KnowledgeGraph:
     #PERFORMANCE
 
     def getLatency(self):
-        '''
+        """
         Get the latency of the sparql endpoint, is the time passed between the request for a triple and when is returned.
         The value returned is the average latency  of the 5 attempts performed.
 
-        :return: average latency if SPARQL endpoint is online.
-        :rtype: float
-        '''
+        Returns:
+            float: A float that is the average latency if SPARQL endpoint is online.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -331,13 +400,13 @@ class KnowledgeGraph:
             return 'SPARQL endpoint absent'
     
     def getThroughput(self):
-        '''
+        """
         Get the throughput of the sparql endpoint, is the number of triples obtained by the endpoint in one second.
         The value returned is the average thrpughput of the 5 attempts performed.
 
-        :return: average throughput if SPARQL endpoint is online.
-        :rtype: float
-        '''
+        Returns:
+            float: A float that represent the throughput of the SPARQL endpoint.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -355,12 +424,12 @@ class KnowledgeGraph:
     #ACCURACY
 
     def checkEmptyLabel(self):
-        '''
+        """
         Count the number of empty label (if any) in the dataset.
 
-        :return: number of empty label if SPARQL endpoint is online.
-        :rtype: int
-        '''
+        Returns:
+            int: An integer that is the number of empty label is SPQRQL endpoint is online.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -379,12 +448,12 @@ class KnowledgeGraph:
             return 'SPARQL endpoint absent'
     
     def checkWhiteSpace(self):
-        '''
+        """
         Count the number of label that have a whitespace at the beginning or at the end.
 
-        :return: number of label with whitespace problem if SPARQL endpoint is online.
-        :rtype: int
-        '''
+        Returns:
+            int: An integer that is the number of label with whitespace problem if SPARQL endpoint is online.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -401,14 +470,14 @@ class KnowledgeGraph:
                 return e
         else:
             return 'SPARQL endpoint offline' 
-    
+        
     def checkDatatypeProblem(self):
-        '''
+        """
         Count the number of literal that do not match the data type indicated.
 
-        :return: number of literal with datatype problem.
-        :rtype: int
-        '''
+        Returns:
+            int: A integer that is the number of literal with datatype problem.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -438,12 +507,12 @@ class KnowledgeGraph:
 
 
     def checkFPViolations(self):
-        '''
+        """
         Check for functional properties with inconsistent value, analyzing all triples with predicate owl:FunctionalProperty and checking if there is any violations.
 
-        :return: Number of triples with functional property violations.
-        :rtype: int
-        '''
+        Returns:
+            int: An integer that is the number of triples with functional property violations.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -470,12 +539,12 @@ class KnowledgeGraph:
             return 'SPARQL endpoint absent'
         
     def checkIFPViolations(self):
-        '''
+        """
         Check for invalid usage of inverse-functional properties, analyzing all triples with predicate owl:InverseFunctionalProperty and checking if there is any violations. 
         
-        :return: Number of triples with inverse-functional properties violations.
-        :rtype: int
-        '''
+        Returns:
+            int: An integer that is the number of triples with inverse-functional properties violations.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -504,12 +573,12 @@ class KnowledgeGraph:
     #CONSISTENCY    
     
     def getDisjointValue(self):
-        '''
+        """
         Get the disjoint value. It is calculated by counting the number of triples with predicate owl:disjointWith and then making the ratio between number of triples with that predicate and number of entities.
 
-        :return: disjoint value if triples and entity is recovered correctly form SPARQL endpoint.
-        :rtype: float
-        '''
+        Returns:
+            float: A float that represent the disjoint value if triples and entity is recovered correctly form SPARQL endpoint.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -547,12 +616,12 @@ class KnowledgeGraph:
             return 'SPARQL endpoint absent'
 
     def getUndefinedClass(self):
-        '''
+        """
         Get the classes used without declaration.
 
-        :return: list of class undefined if SPARQL endpoint is online.
-        :rtype: list 
-        '''
+        Returns:
+            list: A list that contains undefined classes
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -584,12 +653,12 @@ class KnowledgeGraph:
             return 'SPARQL endpoint absent'
 
     def getUndefinedProp(self):
-        '''
+        """
         Get the properties used without declaration.
-
-        :return: list of properties undefined if SPARQL endpoint is online.
-        :rtype: list 
-        '''
+        
+        Returns:
+            list: A list that contains a list of undefined properties. 
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -621,12 +690,12 @@ class KnowledgeGraph:
             return 'SPARQL endpoint absent'
     
     def checkDeprecatedClassesProp(self):
-        '''
+        """
         Check if deprecated classes and properties are used in the KG.
-
-        :return: list of deprecated classes and properties used in the KG, if the SPARQL endpoint is online.
-        :rtype: list
-        '''
+        
+        Returns:
+            list: A list that contains  deprecated classes and properties used in the KG.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -641,13 +710,13 @@ class KnowledgeGraph:
             return 'SPARQL endpoint absent'            
 
     def checkOntologyHijacking(self):
-        '''
+        """
         Check for the ontology hijacking problem, if the SPARQL endpoint is online.
         This problem is present if there are a re-definition of classes or properties considered standard for LOD.
 
-        :return: True if there is a Ontology Hijacking problem, False otherwise.
-        :rtype: bool
-        '''
+        Returns:
+            bool: A boolean that is True if there is a Ontology Hijacking problem, False otherwise.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -671,12 +740,12 @@ class KnowledgeGraph:
             return 'SPARQL endpoint absent'
     
     def checkMisplacedClasses(self):
-        '''
+        """
         Check if the classes are used incorrectly, classes are used in the position of the predicate.
 
-        :return: list of misplaced class, if SPARQL endpoint is online.
-        :rtype: list
-        '''
+        Returns:
+            list: A list of misplaced classes.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -718,12 +787,12 @@ class KnowledgeGraph:
             return 'SPARQL endpoint absent'
 
     def checkMisplacedProperty(self):
-        '''
+        """
         Check if the properties are used incorrectly, properties are used in the position of the subject.
 
-        :return: list of properties with misplaced propery problem
-        :rtype: list 
-        '''
+        Returns:
+            list: A list of properties with misplaced propery problem.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -753,12 +822,12 @@ class KnowledgeGraph:
     #CONCISENESS
 
     def getIntensionalConc(self):
-        '''
+        """
         Get the intensional conciseness value, it is calculated by the following formula: 1.0 - #duplicated properties (calculated with Bloom filter algorithm)/#triples in the dataset.
 
-        :return: intensional conciseness value.
-        :rtype: float
-        '''
+        Returns:
+            float: A float that is the intensional conciseness value.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -801,12 +870,12 @@ class KnowledgeGraph:
             return 'SPARQL endpoint absent'
 
     def getExtensionaConc(self):
-        '''
+        """
         Get the extensional conciseness value, it is calculated by the following formula: 1.0 - #duplicated triples (calculated with Bloom filter algorithm) / #triples in the dataset.
 
-        :return: intensional conciseness value.
-        :rtype: float
-        '''
+        Returns:
+            float: A float that is the extensional conciseness value.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -856,12 +925,12 @@ class KnowledgeGraph:
     
     #REPUTATION
     def getPageRank(self):
-        '''
-         Get the pagerank of KG based on the graph constructed with all the kg discoverable.
+        """
+        Get the pagerank of KG based on the graph constructed with all the kg discoverable.
 
-         :return: pagerank value
-         :rtype: float 
-        '''
+        Returns:
+            float: A float that represent the pagerank value.
+        """
         graph = utils.checkGraphFile()
         pageRank = Graph.getPageRank(graph,self.id)
         pageRank = "%.4f"%pageRank
@@ -870,36 +939,36 @@ class KnowledgeGraph:
     
     #BELIEVABILITY
     def getName(self):
-        '''
+        """
         Get the title of the KG by analyzing the metadata.
 
-        :return: title of KG.
-        :rtype: str
-        '''
+        Returns:
+            string: A string that contains the title of the KG.
+        """
         metadata = aggregator.getDataPackage(self.id)
         title = aggregator.getNameKG(metadata)
         
         return title
 
     def getDescription(self):
-        '''
+        """
         Get the description of the KG by analyzing the metadata.
 
-        :return: description of KG.
-        :rtype: str
-        '''
+        Returns:
+            string: A string that contains a description of the KG.  
+        """
         metadata = aggregator.getDataPackage(self.id)
         description = aggregator.getDescription(metadata)
         
         return description
     
     def getUri(self):
-        '''
+        """
         Get the URI of the KG by analyzing the metadata.
 
-        :return: URI of the KG
-        :rtype: str
-        '''
+        Returns:
+            string: A tring that is the URI of the KG.
+        """
         metadata = aggregator.getDataPackage(self.id)
         sources = aggregator.getSource(metadata)
         url = sources.get('web','Absent')
@@ -907,12 +976,12 @@ class KnowledgeGraph:
         return url
 
     def calculateTrustValue(self):
-        '''
+        """
         Calculate the trust value of the KG. It is a value between -1 and 1, -1 when all believability data is absent, value beetween 0 and 1 based on how many values are present.
 
-        :return: trust value of the KG
-        :rtype: int
-        '''
+        Returns:
+            int: A integer that is the trust value of the KG.
+        """
         metadata = aggregator.getDataPackage(self.id)
         title = aggregator.getNameKG(metadata)
         description = aggregator.getDescription(metadata)
@@ -955,12 +1024,12 @@ class KnowledgeGraph:
     #VERIFIABILITY
 
     def getVocabularies(self):
-        '''
+        """
         Get all the vocabularies used in the KG. This information is retrived from the SPARQL endpoint or VOID file.
 
-        :return: vocabularies list
-        :rtype: list
-        '''
+        Returns:
+            list: A list that contains all the vocabularies used in the KG.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
@@ -978,12 +1047,12 @@ class KnowledgeGraph:
         return vocabularies
 
     def getAuthors(self):
-        '''
+        """
         Get all KG authors. This information is retrived from the SPARQL endpoint or VOID file.
 
-        :return: authors list.
-        :rtype: list
-        '''
+        Returns:
+            list: A list that contains all the authors of the KG.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
@@ -1001,12 +1070,12 @@ class KnowledgeGraph:
         return authors
 
     def getPublishers(self):
-        '''
+        """
         Get all the KG pubilshers. This information is retrived from the SPARQL endpoint or VOID file.
 
-        :return: publishers list.
-        :rtype: list
-        '''
+        Returns:
+            list: A list that contains the publishers of the KG.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
@@ -1024,12 +1093,12 @@ class KnowledgeGraph:
         return publishers
 
     def getContributors(self):
-        '''
+        """
         Get all the KG contributors. This information is retrived from the SPARQL endpoint or VOID file.
 
-        :return: contributors list.
-        :rtype: list
-        '''
+        Returns:
+            list: A list that contains all the contributors to the KG.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
@@ -1047,12 +1116,12 @@ class KnowledgeGraph:
         return contributors
     
     def getSources(self):
-        '''
+        """
         Get the KG sources. This return a Sources object that contains three field: web, email, name.
         
-        :return: sources object with information about: web address, email, name authors or maintainer.
-        :rtype: Sourcecs object
-        '''
+        Returns:
+            Sources object: A Sources object that contain information about web address, email, name authors or maintainer.
+        """
         metadata = aggregator.getDataPackage(self.id)
         sources = aggregator.getSource(metadata)
         if sources == False:
@@ -1063,12 +1132,12 @@ class KnowledgeGraph:
         return sourcesObj  #use sourcesKG() to print information about sources
     
     def checkSign(self):
-        '''
+        """
         Check if the KG is signed.
 
-        :return: True if is signed, False otherwise.
-        :rtype: bool
-        '''
+        Returns:
+            bool: A boolean that is True if is signed, False otherwise.l
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -1092,12 +1161,12 @@ class KnowledgeGraph:
     #CURRENCY
 
     def getCreationDate(self):
-        '''
+        """
         Get the KG creation date. This information is retrived from the SPARQL endpoint or VOID file. False is returned if SPARQL endpoint is offline
 
-        :return: KG creation date
-        :rtype: str
-        '''
+        Returns:
+            string: A string that is the KG creation date  
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
@@ -1119,12 +1188,12 @@ class KnowledgeGraph:
         return creationD
 
     def getModificationDate(self):
-        '''
+        """
         Get the KG modification date. This information is retrived from SPARQL endpoint or VOID file. False is returned if SPARQL endpoint is offline.
 
-        :return: KG modification date.
-        :rtype: str
-        '''
+        Returns:
+            string: A string that contains a KG modification date.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
@@ -1146,12 +1215,12 @@ class KnowledgeGraph:
         return modificationD
     
     def getPercentageUpData(self,modificationDate):
-        '''
+        """
         Get the percentage of updated data. The percentage is calcualted based on the modificationDate given as a parameter.
-
-        :return: percentage of updated data.
-        :rtype: str
-        '''
+        
+        Returns:
+            string: A percentage of updated data.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -1164,12 +1233,12 @@ class KnowledgeGraph:
         return numTriplesUp
     
     def getLastUp(self):
-        '''
+        """
         Get the elapsed time since the last modification (in days).
 
-        :return: days that have passed since the last modification.
-        :rtype: int
-        '''
+        Returns:
+            string: A string that represent the days that have passed since the last modification.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
@@ -1202,12 +1271,12 @@ class KnowledgeGraph:
     #VOLATILITY
     
     def getFrequencyUp(self):
-        '''
+        """
         Get the KG update frequency. This information is retrived from SPARQL endpoint or VOID file.
 
-        :return: KG update frequency.
-        :rtype: str
-        '''
+        Returns:
+            string: A string that contains the KG update frequency.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
@@ -1227,12 +1296,12 @@ class KnowledgeGraph:
     #COMPLETENESS
 
     def getInterlinkingComp(self):
-        '''
+        """
         Calcuate the interlinking completeness. It is calculated by the ratio between the number of linked triples and number of all triples in the dataset.
 
-        :return: interlinking completeness.
-        :rtype: int
-        '''
+        Returns:
+            int: An integer that is the interlinking completeness of the KG.
+        """
         externalLinks = aggregator.getExternalLinks(self.id)
         exLinksObj = utils.toObjectExternalLinks(externalLinks)
         triplesL = 0
@@ -1271,12 +1340,12 @@ class KnowledgeGraph:
     #AMOUNT OF DATA
 
     def getNumTriples(self):
-        '''
+        """
         Get the number of triples in the KG. This information can be obtained by SPARQL endpoint or analyzing the metadata of the dataset.
 
-        :return: Number of triples.
-        :rtype: int
-        '''
+        Returns:
+            int: An integer that is the number of triples.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         metadata = aggregator.getDataPackage(self.id)
         if isinstance(url,str):
@@ -1291,12 +1360,12 @@ class KnowledgeGraph:
         return triples
     
     def getNumEntities(self):
-        '''
+        """
         Count the number of entities in the dataset. This information can be obtained by a SPARQL endpoint or analyzing the VoID file.
 
-        :return: The number of entities in the KG.
-        :rtype: int
-        '''
+        Returns:
+            int: An integer that is the number of entities in the KG.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
@@ -1346,12 +1415,12 @@ class KnowledgeGraph:
             return 'SPARQL endpoint and VoID file absent'
 
     def getNumProperty(self):
-        '''
+        """
         Get the number of property in the KG. This information is retrived by executing a query on the SPARQL endpoint.
 
-        :return: poperty number
-        :rtype: int
-        '''
+        Returns:
+            int: An integer that is the number of properties in the KG.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -1366,12 +1435,12 @@ class KnowledgeGraph:
     #REPRESENTATIONAL-CONCISENESS
     
     def getUriLenghtSub(self):
-        '''
+        """
         Get the uri's length in the subject position. The returned value is a list in which the values are respectively min-max-average-standard deviation.
 
-        :return: subject uri's length.
-        :rtype: list
-        '''
+        Returns:
+            list: A list that contains all the URI in the KG.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -1400,12 +1469,12 @@ class KnowledgeGraph:
         return length
     
     def getUriLenghtObj(self):
-        '''
+        """
         Get the uri's length in the object position. The returned value is a list in which the values are respectively min-max-average-standard deviation.
 
-        :return: object uri's length.
-        :rtype: list
-        '''
+        Returns:
+            list: A list that contains all the URI in the object position
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -1432,12 +1501,12 @@ class KnowledgeGraph:
         return length
     
     def getUriLenghtPr(self):
-        '''
+        """
         Get the uri's length in the predicate position. The returned value is a list in which the values are respectively min-max-average-standard deviation.
 
-        :return: predicate uri's length.
-        :rtype: list
-        '''
+        Returns:
+            list: A list that contains URIs in the predicate position.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -1464,12 +1533,12 @@ class KnowledgeGraph:
         return length
 
     def checkRDFStr(self):
-        '''
+        """
         Check if RDF data structures is used in the KG. 
 
-        :return: True is are used, False otherwise.
-        :rtype: bool
-        '''
+        Returns:
+            bool: A boolean that is True if are used, False otherwise.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -1484,12 +1553,13 @@ class KnowledgeGraph:
     #REPRESENTATIONAL-CONSISTENCY
 
     def checkReuseTerms(self):
-        '''
+        """
         Check usage of existing terms. This check is done using the Linked Open Vocabulary, a KG that contains vocabulary and terms standard for Linked Open Data.
 
-        :return: True if no new terms are defined, False otherwise.
-        :rtype: bool
-        '''
+        Returns:
+            bool: A boolean that is True if no new terms are defined, False otherwise.
+
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -1508,12 +1578,12 @@ class KnowledgeGraph:
             return 'SPARQL endpoint absent'
     
     def checkReuseVocabs(self):
-        '''
+        """
         Check usage of existing vocabularies. This check is done using the Linked Open Vocabulary, a KG that contains vocabularies and terms standard for Linked Open Data.
 
-        :return: True if no new vocabularies are defined, False otherwise.
-        :rtype: bool
-        '''
+        Returns:
+            bool: A boolean that is True if no new vocabularies are defined, False otherwise.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -1538,12 +1608,12 @@ class KnowledgeGraph:
     #UNDERSTENDABILITY
 
     def getNumLabels(self):
-        '''
+        """
         Count the number of label on the triples in the KG. This count is done by using a query on the SPARQL endpoint.
 
-        :return: Number of label in the KG.
-        :rtype: int
-        '''
+        Returns:
+            int: An integer that is the number of label in the KG.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -1556,12 +1626,12 @@ class KnowledgeGraph:
         return numLabel
 
     def getRegex(self):
-        '''
+        """
         Return the uri regex of the KG. This check id done by using a query on the SPARQL endpoin or by analyzing the VoID file if available.
 
-        :return: A list with the uri regex.
-        :rtype: list
-        '''
+        Returns:
+            list: A list with the URI regex
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
@@ -1589,12 +1659,12 @@ class KnowledgeGraph:
         return regex
 
     def checkExample(self):
-        '''
+        """
         Check if query examples are provided with the KG. This information is obtained by analyzing the KG metadata, in particular, the field other resources.
 
-        :return: True if there are any query examples, False otherwise.
-        :rtype: bool
-        '''
+        Returns:
+            bool: A boolean that is True if there are any query examples , False otherwise.
+        """
         resources = aggregator.getOtherResources(self.id)
         resources = utils.insertAvailability(resources)
         otResources = utils.toObjectResources(resources)
@@ -1612,12 +1682,12 @@ class KnowledgeGraph:
     #INTERPRETABILITY
 
     def getNumbBN(self):
-        '''
+        """
         Get the blank node number. This is obtained by querying the SPARQL endpoint.
-
-        :return: blank node number.
-        :rtype: int
-        '''
+        
+        Returns:    
+            int: An integer that represent the number of blank node in the KG.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -1632,12 +1702,12 @@ class KnowledgeGraph:
     #VERSATILIY
 
     def getSerializationFormat(self):
-        '''
+        """
         Get the KG serialization formats. This information is retrived by executing a query on the SPARQL endpoint or from VoID file if available.
 
-        :return: list of serialization formats.
-        :rtype: list
-        '''
+        Returns:
+            list: A list that contains all the serialization formats supported by the KG.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
@@ -1655,12 +1725,12 @@ class KnowledgeGraph:
         return formats
     
     def getLanguages(self):
-        '''
+        """
         Get the languages supported by the KG. This information is retrieved by querying the SPARQL endpoint.
         
-        :return: a list with all language supported.
-        :rtype: list
-        '''
+        Returns:
+            list: A list with all the languages supprted by the KG.
+        """
         url = aggregator.getSPARQLEndpoint(self.id)
         if isinstance(url,str):
             try:
@@ -1673,12 +1743,12 @@ class KnowledgeGraph:
         return languages
     
     def getAccessAtKG(self):
-        '''
+        """
         Get the ways in which you can access the KG. This information is retrived by analyzing the metadata and/or querying the SPARQL endpoint.
 
-        :return: a list with the links to access at the KG.
-        :rtype: list
-        '''
+        Returns:
+            list: A list with all the links to access to the KG.
+        """
         links = []
         url = aggregator.getSPARQLEndpoint(self.id)
         voidFile = utils.checkVoidFile(self.id)

@@ -10,7 +10,7 @@ pip install kgheartbeat
 ## Calculate the *Availability* dimension
 This example show how calculate the availability of a KG, we need to calculate all the metrics connected to them. Suppose we want to calculate the availability for DBpedia.
 
-```py
+```python
 from kgheartbeat import KnowledgeGraph
 
 # Instanziate a KnowledgeGraph class, passing the id of the kg to be analyzed
@@ -35,7 +35,7 @@ print(f"SPARQL endpoint availability: {sparqlAv}\n \
 ## Calculate the *Licensing* dimension
 In this example we want to calculate the *licensing* dimension for Taxref-ld 
 
-```py
+```python
 from kgheartbeat import KnowledgeGraph
 
 # Instanziate a KnowledgeGraph class, passing the id of the kg to be analyzed
@@ -52,7 +52,7 @@ print(f"Machine redeable license: {mr_license}\nHuman-redeable license: {hr_lice
 ## Calculate the *Versatility* dimension
 This is another example, in which we demostrate how calculate all the metric in the *Versatility* dimension.
 
-```py
+```python
 # Instanziate a KnowledgeGraph class, passing the id of the kg to be analyzed
 kg = KnowledgeGraph('bncf-ns')
 
