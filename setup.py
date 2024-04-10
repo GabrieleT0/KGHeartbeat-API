@@ -15,7 +15,7 @@ with open(path.join(HERE, 'README.md'), encoding='utf-8') as f:
 # This call to setup() does all the work
 setup(
     name="kgheartbeat",
-    version="0.2.2",
+    version="0.2.4",
     description="Library that allows to perform Knowledge Graph (Linked Open Data) quality analysis.",
     long_description_content_type="text/markdown",
     long_description=long_description,
