@@ -15,11 +15,11 @@ with open(path.join(HERE, 'README.md'), encoding='utf-8') as f:
 # This call to setup() does all the work
 setup(
     name="kgheartbeat",
-    version="0.2.4",
+    version="0.2.5",
     description="Library that allows to perform Knowledge Graph (Linked Open Data) quality analysis.",
     long_description_content_type="text/markdown",
     long_description=long_description,
-    url="https://knowledge-graph-quality-analysis-api.readthedocs.io/",
+    url="https://gabrielet0.github.io/KGHeartbeat-API/reference/",
     author="Gabriele Tuozzo, Maria Angela Pellegrino",
     author_email="gabrieletuozzo@gmail.com",
     license="MIT",

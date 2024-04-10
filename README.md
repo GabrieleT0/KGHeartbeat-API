@@ -1,10 +1,34 @@
-# KGHeartbeat API
+# KGHeartBeat API
+
+1. [What is KGHeartBeat API](#what-is-kgheartbeat-api)
+2. [Installation](#installation)
+3. [Quality metrics covered]()
+4. [Examples](#examples)  
+
+# What is KGHeartBeat API
 Library that allows you to perform Knowledge Graph (Linked Open Data) quality analysis.
 
-### Installation
+The granularity with which KG quality can be measured is at the metric level, meaning that it is possible to combine the calculation of multiple metrics to obtain KG quality for a dimension. The [examples](#examples) section shows how you can calculate the quality of different dimensions combining together the calculation of different metrics.
+
+For documentation on the library implementation visit here: [https://gabrielet0.github.io/KGHeartbeat-API/reference/](https://gabrielet0.github.io/KGHeartbeat-API/reference/)
+
+# Quality metrics covered
+Below is a graph showing the quality dimensions covered by KGHeartbeat and the percentage of metrics measured in each of them.
+
+![Quality metrics covered by KGHeartbeat](img/quality_metrics.png)
+
+For more information on how they are calculated visit here: [https://isislab-unisa.github.io/KGHeartbeat/](https://isislab-unisa.github.io/KGHeartbeat/)
+
+
+# Installation
 ```
 pip install kgheartbeat
 ```
+
+# Examples
+1. [Calculate the Availability dimension](#calculate-the-availability-dimension)
+2. [Calculate the Licensing dimension](#calculate-the-licensing-dimension)
+3. [Calcuate the Versatility dimension](#calcuate-the-versatility-dimension)
 
 ### Calculate the *Availability* dimension
 ```Python
@@ -59,3 +83,4 @@ link_access = kg.getAccessAtKG()
 
 print(f"Serialization formats: {formats}\nLanguages: {languages}\n Link to access the KG:{link_access}\n")
 ```
+
