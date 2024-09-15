@@ -28,7 +28,7 @@ def getMetadati(idKG):
         string: A string that represent the metadata of the KG.
     """
 
-    url = 'https://kgs-search-engine.herokuapp.com/brutalSearch?keyword=%s'%idKG
+    url = 'http://www.isislab.it:12280/kgsearchengine/brutalSearch?keyword=%s'%idKG
     try:
         response = requests.get(url)    
         if response.status_code == 200:
@@ -106,7 +106,7 @@ def getIdByName(keyword):
     Returns:
         list: A list of KG IDs matching the keyword.
     """
-    url = 'https://kgs-search-engine.herokuapp.com/brutalSearch?keyword=%s'%keyword
+    url = 'http://www.isislab.it:12280/kgsearchengine/brutalSearch?keyword=%s'%keyword
     try:
         response = requests.get(url)    
         if response.status_code == 200:
