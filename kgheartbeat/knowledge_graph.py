@@ -199,7 +199,7 @@ class KnowledgeGraph:
                     defValue = 'No uri found'
             except:
                 defValue = 'Could not process formulated query on indicated endpoint'
-        
+    
         return defValue
     
     #LICENSING
@@ -1706,10 +1706,14 @@ class KnowledgeGraph:
         Get the KG serialization formats. This information is retrived by executing a query on the SPARQL endpoint or from VoID file if available.
 
         Returns:
-            list: A list that contains all the serialization formats supported by the KG.
+            list: formats: A list that contains all the serialization formats supported by the KG recovered from data or VoID file.
+            list: media_types_metadata: A list that contains all the serialization formats supported by the KG recovered from metadata.
         """
         url = aggregator.getSPARQLEndpoint(self.id)
         voidFile = utils.checkVoidFile(self.id)
+        other_resources = aggregator.getOtherResources(self.id)
+        media_types_metadata = utils.extract_media_type(other_resources)
+
         if isinstance(url,str):
             try:
                 formats = q.checkSerialisationFormat(url)
@@ -1722,8 +1726,8 @@ class KnowledgeGraph:
         else:
             formats = 'SPARQL endpoint and VoID file absent'
         
-        return formats
-    
+        return formats, media_types_metadata
+
     def getLanguages(self):
         """
         Get the languages supported by the KG. This information is retrieved by querying the SPARQL endpoint.

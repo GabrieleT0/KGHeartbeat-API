@@ -348,8 +348,11 @@ def checkAvailabilityForDownload(resources):
             if type == 'full_download' and status == 'active':  
                 availability = True
         if isinstance(format,str):
-            if 'ZIP' in format and status == 'active':
+            if status == 'active':
                 availability = True
+            '''
+            elif status == 'offline':
+                availability = False
             if 'zip' in format and status == 'active':
                 availability = True
             if format == 'application/rdf+xml' and status == 'active':
@@ -368,7 +371,7 @@ def checkAvailabilityForDownload(resources):
                 availability = True
             if format == 'rdf/turtle' and status == 'active':
                 availability = True
-            
+            '''
     return availability
 
 def getLinkDownload(resources):
@@ -851,3 +854,19 @@ def checkVoidFile(idKG):
             return voidFile
     else:
         return False
+    
+def extract_media_type(resources_metadata):
+    media_type = []
+    for resource in resources_metadata:
+        if 'format' in resource:
+            media_type.append(resource['format'])
+    
+    return media_type
+
+def check_common_acceppted_format(media_types):
+    common_acceppted_format = ['application/rdf+xml','application/rdf+xml','text/turtle','application/x-ntriples','application/x-nquads','text/n3','rdf','text/rdf+n3','rdf/turtle']
+    for media_type in media_types:
+        if media_type in common_acceppted_format:
+            return True
+
+    return False 
