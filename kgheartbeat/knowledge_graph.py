@@ -3,7 +3,6 @@ import json
 import re
 import socket
 from urllib.error import URLError
-from numpy import source, void
 import numpy
 from rdflib import VOID, Graph as rdfG
 from requests import HTTPError
