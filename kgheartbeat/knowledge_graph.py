@@ -13,6 +13,7 @@ from kgheartbeat import utils,VoIDAnalyses,Graph,LOVAPI
 from SPARQLWrapper import SPARQLExceptions
 from kgheartbeat.bloomfilter import BloomFilter
 from kgheartbeat.sources import Sources
+from kgheartbeat import utils
 
 """
 This class is used to instanziate a KG by id. All information for analysis is recovered from the id.
@@ -93,6 +94,7 @@ class KnowledgeGraph:
 
     def __init__(self,id):
         self.id = id
+        utils.update_local_lodc_spnapshot()
 
     #AVAILABILITY
     

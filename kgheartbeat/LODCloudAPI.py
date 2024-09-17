@@ -1,4 +1,6 @@
 import requests
+import json
+import os
 
 """
 This module is used to extract the metadata for a particular KG from DataHub (https://old.datahub.io/). 
@@ -33,18 +35,13 @@ def getJSONMetadata(idKG):
     Returns:
         dict: A dict that contains all the metadata of the KG.
     """
-    url = 'https://lod-cloud.net/json/%s'%idKG
-    try:
-        response = requests.get(url)
-        if response.status_code == 200:
-            jsonMetadata = response.json()
-            return jsonMetadata
-        elif response.status_code == 404:
-            print('Dataset not found on LOD Cloud')
-            return False
-    except:
-        print('Failed to connect  to LOD Cloud')
-        return False
+    here = os.path.dirname(os.path.abspath(__file__))
+    save_path = os.path.join(here,'./lodc_snapshot')
+    here = os.path.dirname(os.path.abspath(__file__))
+    save_path = os.path.join(save_path,"lod-data.json")
+    with open(save_path, 'r') as json_file:
+        kgs_metadata = json.load(json_file)
+        return kgs_metadata.get(idKG,None)
 
 def getNameKG(metadata):
     """Get the KG name form the kg metadata.

@@ -37,12 +37,12 @@ def getDataPackage(idKG):
     Returns:
         dict: A dict that contains all the metadata of the KG.
     """
-    metadataDH = DataHubAPI.getDataPackage(idKG)
     metadataLODC = LODCloudAPI.getJSONMetadata(idKG)
+    if isinstance(metadataLODC,dict):
+        return metadataLODC
+    metadataDH = DataHubAPI.getDataPackage(idKG)
     if isinstance(metadataDH,dict):
         return metadataDH
-    elif isinstance(metadataLODC,dict):
-        return metadataLODC
     else:
         return False
 

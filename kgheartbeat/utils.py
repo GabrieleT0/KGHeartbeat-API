@@ -13,6 +13,7 @@ from kgheartbeat.resources  import Resources
 from kgheartbeat import query as q
 import networkx as nx
 import pickle
+import json
 
 #PRINT THE METADATI OF A KG
 def printMetadatiKG(metadct):
@@ -870,3 +871,17 @@ def check_common_acceppted_format(media_types):
             return True
 
     return False 
+
+def update_local_lodc_spnapshot():
+    url = "https://lod-cloud.net/versions/latest/lod-data.json"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        data = response.json()
+    
+    here = os.path.dirname(os.path.abspath(__file__))
+    save_path = os.path.join(here,'./lodc_snapshot')
+    here = os.path.dirname(os.path.abspath(__file__))
+    save_path = os.path.join(save_path,"lod-data.json")
+    with open(save_path, 'w') as json_file:
+        json.dump(data, json_file, indent=4)
