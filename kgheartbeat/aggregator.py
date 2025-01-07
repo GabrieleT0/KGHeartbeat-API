@@ -40,9 +40,9 @@ def getDataPackage(idKG):
     metadataLODC = LODCloudAPI.getJSONMetadata(idKG)
     if isinstance(metadataLODC,dict):
         return metadataLODC
-    metadataDH = DataHubAPI.getDataPackage(idKG)
-    if isinstance(metadataDH,dict):
-        return metadataDH
+    #metadataDH = DataHubAPI.getDataPackage(idKG)
+    #if isinstance(metadataDH,dict):
+    #    return metadataDH
     else:
         return False
 
@@ -74,11 +74,11 @@ def getLicense(metadata):
     Returns:
         string: A string that represent the KG license.
     """
-    licenseDH = DataHubAPI.getLicense(metadata)
+    #licenseDH = DataHubAPI.getLicense(metadata)
     licenseLODC = LODCloudAPI.getLicense(metadata)
-    if licenseDH != False:
-        return licenseDH
-    elif licenseLODC != False:
+    #if licenseDH != False:
+    #    return licenseDH
+    if licenseLODC != False:
         return licenseLODC
     else:
         return False
@@ -170,12 +170,12 @@ def getOtherResources(idKG):
     Returns:
         list: A list which contains all the links to other resources.
     """
-    metadataDH = DataHubAPI.getDataPackage(idKG)
+    #metadataDH = DataHubAPI.getDataPackage(idKG)
     metadataLODC = LODCloudAPI.getJSONMetadata(idKG)
-    otResourcesDH = DataHubAPI.getOtherResources(metadataDH)
+    #otResourcesDH = DataHubAPI.getOtherResources(metadataDH)
     otResourcesLODC = LODCloudAPI.getOtherResources(metadataLODC)
-    if otResourcesDH == False:
-        otResourcesDH = []
+    #if otResourcesDH == False:
+    otResourcesDH = []
     if otResourcesLODC == False:
         otResourcesLODC = []
     otherResources = utils.mergeResources(otResourcesDH,otResourcesLODC)

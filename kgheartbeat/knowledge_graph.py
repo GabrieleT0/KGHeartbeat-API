@@ -239,10 +239,64 @@ class KnowledgeGraph:
                     void = True
                 except:
                     void = False 
-        if void == True:
-            licenseV = VoIDAnalyses.getLicense(voidFile)  #GETTING LICENSE FROM THE VOID FILE
-            if isinstance(licenseV,str):
-                return licenseV
+            if void == True:
+                licenseV = VoIDAnalyses.getLicense(voidFile)  #GETTING LICENSE FROM THE VOID FILE
+                if isinstance(licenseV,str):
+                    return licenseV
+        return 'No license indicated'
+    
+    def getLicenseMRMeta(self):
+        """
+        Return the machine-redeable license of the kg, checking only in the metadata.
+        
+        Returns:
+            string: A string that represent the machine-redeable license of the KG.
+        """
+        metadata = aggregator.getDataPackage(self.id)
+        if metadata != False:
+            licenseM = aggregator.getLicense(metadata) #CHECKING IN THE METADATA
+            if isinstance(licenseM,str): 
+                return licenseM   #IF LICENSE IS INDICATED IN THE METADATE, RETURN IT
+            else:
+                return 'Not indicated'
+        else:
+            return 'Metadata not available'
+    
+    def getLicenseMRSparql(self):
+        """
+        Return the machine-redeable license of the kg, checking in the SPARQL endpoint.
+        
+        Returns:
+            string: A string that represent the machine-redeable license of the KG.
+        """
+        try:
+            licenseQ = q.checkLicenseMR2(aggregator.getSPARQLEndpoint(self.id)) #CHECKING ON THE SPARQL ENDPOINT
+            if isinstance(licenseQ,list):
+                return licenseQ
+        except Exception as e:
+            return e
+
+    def getLicenseMRVoID(self):
+        resources = aggregator.getOtherResources(self.id)
+        resources = utils.insertAvailability(resources)
+        otResources = utils.toObjectResources(resources)
+        urlV = utils.getUrlVoID(otResources)
+        if isinstance(urlV,str):  # CHECKING IF VOID FILE IS AVAILABLE
+            try:
+                voidFile = VoIDAnalyses.parseVoID(urlV)
+                void = True
+            except:
+                try:
+                    voidFile = VoIDAnalyses.parseVoIDTtl(urlV)
+                    void = True
+                except:
+                    void = False 
+            if void == True:
+                licenseV = VoIDAnalyses.getLicense(voidFile)  #GETTING LICENSE FROM THE VOID FILE
+                if isinstance(licenseV,str):
+                    return licenseV
+        else:
+            return "VoID file absent"
 
     def getLicenseHR(self):
         """
