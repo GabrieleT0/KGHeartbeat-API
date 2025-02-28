@@ -137,7 +137,7 @@ def getTriples(metadata):
     else:
         return False
 
-def getSPARQLEndpoint(idKG):
+def getSPARQLEndpoint(knowledge_graph):
     """Get the SPARQL endpoint from the KG id, try to find on both DataHub and LODCloud.
     If the link is available on both the service, is selected the one from LODCloud    
     Args:
@@ -146,20 +146,23 @@ def getSPARQLEndpoint(idKG):
     Returns:
         string: A string that is the SPARQL endpoint link.
     """
-    metadataLODC = LODCloudAPI.getJSONMetadata(idKG)
-    metadataDH = DataHubAPI.getDataPackage(idKG)
-    endpointLODC = LODCloudAPI.getSPARQLEndpoint(metadataLODC)  
-    endpointDH = DataHubAPI.getSPARQLEndpoint(metadataDH)
-    if endpointLODC != False:
-        if isinstance(endpointLODC,str):
-            if endpointLODC != '':
-                return endpointLODC
+    if not knowledge_graph.sparql_endpoint:
+        metadataLODC = LODCloudAPI.getJSONMetadata(knowledge_graph.id)
+        metadataDH = DataHubAPI.getDataPackage(knowledge_graph.id)
+        endpointLODC = LODCloudAPI.getSPARQLEndpoint(metadataLODC)  
+        endpointDH = DataHubAPI.getSPARQLEndpoint(metadataDH)
+        if endpointLODC != False:
+            if isinstance(endpointLODC,str):
+                if endpointLODC != '':
+                    return endpointLODC
+                else:
+                    return endpointDH
             else:
                 return endpointDH
         else:
             return endpointDH
     else:
-        return endpointDH
+        return knowledge_graph.sparql_endpoint
 
 def getOtherResources(idKG):
     """Get all the other resources related with the KG (e.g. examples of SPARQL query).

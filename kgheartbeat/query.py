@@ -25,9 +25,12 @@ def checkEndPoint(url):
     LIMIT 1
     """)
     sparql.setTimeout(600) #10 minutes
-    result = sparql.query().convert()
-    return result
-
+    try:
+        result = sparql.query().convert()
+        return result
+    except:
+        return False
+    
 @log_in_out
 def getNumTripleQuery(url): #TODO QUERY WITHOUT COUNT (MAY NOT BE SUPPORTED)
     sparql = SPARQLWrapper(url)
@@ -1077,6 +1080,30 @@ def getAllTriplesSPO(url):
             return False
     except Exception as e:
         return e
+    
+@log_in_out
+def getAllTriplesSPOLimited(url):
+    sparql = SPARQLWrapper(url)
+    sparql.setQuery('''
+    SELECT *
+    WHERE{?s ?p ?o}
+    LIMIT 5000
+    ''')
+    sparql.setTimeout(600) #10 minutes
+    sparql.setReturnFormat(JSON)
+    try:
+        results = sparql.query().convert()
+        if isinstance(results,dict):
+            result = results.get('results')
+            bindings = result.get('bindings')
+            return bindings
+        elif isinstance(results,Document): 
+            bindings = utils.xmlToDictSPO(results)
+            return bindings
+        else:
+            return False
+    except Exception as e:
+        return e
 
 @log_in_out
 def getSign(url):
@@ -1209,5 +1236,35 @@ def getUris(url):
     elif isinstance(results,Document):
         uriList = utils.getResultsFromXML(results)
         return uriList
+    else:
+        return False
+    
+@log_in_out
+def getSkosMapping(url):
+    sparql = SPARQLWrapper(url)
+    sparql.setQuery('''
+    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+    SELECT (COUNT(?o) AS ?triples)
+    WHERE {
+        {?s skos:closeMatch ?o}
+        UNION   
+        {?s skos:exactMatch ?o}
+        UNION   
+        {?s skos:broadMatch ?o}
+        UNION   
+        {?s skos:narrowMatch ?o}
+        UNION   
+        {?s skos:relatedMatch ?o}
+    }
+    ''')
+    sparql.setTimeout(300)
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+    if isinstance(results,dict):
+        value = utils.getResultsFromJSONCountInt(results)
+        return value
+    elif isinstance(results,Document):
+        value = utils.getResultsFromXMLCount(results)
+        return value
     else:
         return False

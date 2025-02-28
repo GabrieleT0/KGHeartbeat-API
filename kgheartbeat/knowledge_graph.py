@@ -7,13 +7,13 @@ import numpy
 from rdflib import VOID, Graph as rdfG
 from requests import HTTPError
 import requests
-from kgheartbeat import aggregator
-from kgheartbeat import query as q
+import aggregator
+import query as q
 from kgheartbeat import utils,VoIDAnalyses,Graph,LOVAPI
 from SPARQLWrapper import SPARQLExceptions
 from kgheartbeat.bloomfilter import BloomFilter
 from kgheartbeat.sources import Sources
-from kgheartbeat import utils
+import utils
 
 """
 This class is used to instanziate a KG by id. All information for analysis is recovered from the id.
@@ -92,8 +92,9 @@ This class include the following methods:
 
 class KnowledgeGraph:
 
-    def __init__(self,id):
+    def __init__(self,id=None,sparql_endpoint=None):
         self.id = id
+        self.sparql_endpoint = sparql_endpoint
         utils.update_local_lodc_spnapshot()
 
     #AVAILABILITY
@@ -104,7 +105,7 @@ class KnowledgeGraph:
         Returns:
             bool: A boolean that represent the SPARQL endpoint availability (True = Online and False = Offline).
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         try:
             result = q.checkEndPoint(url)
             if isinstance(result,bytes):
@@ -160,7 +161,7 @@ class KnowledgeGraph:
             float: A float that represent a value which is the ratio between: number of deferenceable URIs and number of total URIs considered.
 
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         try:
             defCount = 0
             uriCount = 0
@@ -182,7 +183,7 @@ class KnowledgeGraph:
             try:
                 uriCount = 0
                 defCount = 0
-                allTriples = q.getAllTriplesSPO(url)
+                allTriples = q.getAllTriplesSPOLimited(url)
                 for i in range(5000):
                     s = allTriples[i].get('s')
                     value = s.get('value')
@@ -219,7 +220,7 @@ class KnowledgeGraph:
             return licenseM   #IF LICENSE IS INDICATED IN THE METADATE, RETURN IT
 
         try:
-            licenseQ = q.checkLicenseMR2(aggregator.getSPARQLEndpoint(self.id)) #CHECKING ON THE SPARQL ENDPOINT
+            licenseQ = q.checkLicenseMR2(aggregator.getSPARQLEndpoint(self)) #CHECKING ON THE SPARQL ENDPOINT
             if isinstance(licenseQ,list):
                 return licenseQ
         except Exception as e:
@@ -270,7 +271,7 @@ class KnowledgeGraph:
             string: A string that represent the machine-redeable license of the KG.
         """
         try:
-            licenseQ = q.checkLicenseMR2(aggregator.getSPARQLEndpoint(self.id)) #CHECKING ON THE SPARQL ENDPOINT
+            licenseQ = q.checkLicenseMR2(aggregator.getSPARQLEndpoint(self)) #CHECKING ON THE SPARQL ENDPOINT
             if isinstance(licenseQ,list):
                 return licenseQ
         except Exception as e:
@@ -305,7 +306,7 @@ class KnowledgeGraph:
         Returns:
             list: A list which contain all the human-redeable license founded in the KG.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         try:
             license = q.checkLicenseHR(url)
         except Exception as e:
@@ -363,7 +364,7 @@ class KnowledgeGraph:
             int: A integer that is the number of sameAs chains.
         """
         try:
-            url = aggregator.getSPARQLEndpoint(self.id)
+            url = aggregator.getSPARQLEndpoint(self)
             if isinstance(url,str):
                 numSameAs = q.getSameAsChains(url)
             else:
@@ -374,6 +375,22 @@ class KnowledgeGraph:
             numSameAs = e
 
         return numSameAs
+    
+    def getSkosMapping(self):
+        """
+        Retrieves the SKOS mapping from the knowledge graph.
+        This method attempts to fetch the SKOS mapping by querying the knowledge graph
+        using the provided access URL. If the query fails, it returns a hyphen ('-').
+        Returns:
+            int: The number of SKOS mapping if the query is successful, otherwise '-'.
+        """
+
+        try:
+            numberSkosMapping = q.getSkosMapping(aggregator.getSPARQLEndpoint(self))
+        except Exception as error:
+            numberSkosMapping = '-'
+
+        return numberSkosMapping
 
     def getExternalProvider(self):
         """
@@ -396,7 +413,7 @@ class KnowledgeGraph:
         Returns:
             bool: A boolean that is True if authentication is required, False otherwise.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 q.checkEndPoint(url)
@@ -415,7 +432,7 @@ class KnowledgeGraph:
         Returns:
             bool: A boolean that is True if HTTPS is used, Flase otherwise.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 isSecure = utils.checkhttps(url)
@@ -440,7 +457,7 @@ class KnowledgeGraph:
         Returns:
             float: A float that is the average latency if SPARQL endpoint is online.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 latency = q.testLatency(url)
@@ -462,7 +479,7 @@ class KnowledgeGraph:
         Returns:
             float: A float that represent the throughput of the SPARQL endpoint.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 tp = utils.getThroughput(url)
@@ -485,7 +502,7 @@ class KnowledgeGraph:
         Returns:
             int: An integer that is the number of empty label is SPQRQL endpoint is online.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 labels = q.getLabel(url)
@@ -509,7 +526,7 @@ class KnowledgeGraph:
         Returns:
             int: An integer that is the number of label with whitespace problem if SPARQL endpoint is online.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 wsCount = 0
@@ -533,7 +550,7 @@ class KnowledgeGraph:
         Returns:
             int: A integer that is the number of literal with datatype problem.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 dataTypeProblem = 0
@@ -568,7 +585,7 @@ class KnowledgeGraph:
         Returns:
             int: An integer that is the number of triples with functional property violations.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 violationFP = []
@@ -600,7 +617,7 @@ class KnowledgeGraph:
         Returns:
             int: An integer that is the number of triples with inverse-functional properties violations.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 violationIFP = []
@@ -634,7 +651,7 @@ class KnowledgeGraph:
         Returns:
             float: A float that represent the disjoint value if triples and entity is recovered correctly form SPARQL endpoint.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 numDisjoint = q.getDisjoint(url)
@@ -677,7 +694,7 @@ class KnowledgeGraph:
         Returns:
             list: A list that contains undefined classes
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 allTriples = q.getAllTriplesSPO(url)
@@ -714,7 +731,7 @@ class KnowledgeGraph:
         Returns:
             list: A list that contains a list of undefined properties. 
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 uriListP = q.getAllPredicate(url)
@@ -751,7 +768,7 @@ class KnowledgeGraph:
         Returns:
             list: A list that contains  deprecated classes and properties used in the KG.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 deprecated = q.getDeprecated(url)
@@ -772,7 +789,7 @@ class KnowledgeGraph:
         Returns:
             bool: A boolean that is True if there is a Ontology Hijacking problem, False otherwise.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 allType = q.getAllType(url)
@@ -801,7 +818,7 @@ class KnowledgeGraph:
         Returns:
             list: A list of misplaced classes.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 misplacedClass = []
@@ -848,7 +865,7 @@ class KnowledgeGraph:
         Returns:
             list: A list of properties with misplaced propery problem.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 misplacedProperty = []
@@ -883,7 +900,7 @@ class KnowledgeGraph:
         Returns:
             float: A float that is the intensional conciseness value.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 allProperty = q.getAllPropertySP(url)
@@ -931,7 +948,7 @@ class KnowledgeGraph:
         Returns:
             float: A float that is the extensional conciseness value.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 allTriples = q.getAllTriplesSPO(url)
@@ -1085,7 +1102,7 @@ class KnowledgeGraph:
         Returns:
             list: A list that contains all the vocabularies used in the KG.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
             try:
@@ -1108,7 +1125,7 @@ class KnowledgeGraph:
         Returns:
             list: A list that contains all the authors of the KG.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
             try:
@@ -1131,7 +1148,7 @@ class KnowledgeGraph:
         Returns:
             list: A list that contains the publishers of the KG.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
             try:
@@ -1154,7 +1171,7 @@ class KnowledgeGraph:
         Returns:
             list: A list that contains all the contributors to the KG.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
             try:
@@ -1193,7 +1210,7 @@ class KnowledgeGraph:
         Returns:
             bool: A boolean that is True if is signed, False otherwise.l
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 sign = q.getSign(url)
@@ -1222,7 +1239,7 @@ class KnowledgeGraph:
         Returns:
             string: A string that is the KG creation date  
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
             try:
@@ -1249,7 +1266,7 @@ class KnowledgeGraph:
         Returns:
             string: A string that contains a KG modification date.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
             try:
@@ -1276,7 +1293,7 @@ class KnowledgeGraph:
         Returns:
             string: A percentage of updated data.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 numTriplesUp = q.getNumUpdatedData(url,modificationDate)
@@ -1294,7 +1311,7 @@ class KnowledgeGraph:
         Returns:
             string: A string that represent the days that have passed since the last modification.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
             try:
@@ -1332,7 +1349,7 @@ class KnowledgeGraph:
         Returns:
             string: A string that contains the KG update frequency.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
             try:
@@ -1367,7 +1384,7 @@ class KnowledgeGraph:
             value = re.sub("[^\d\.]", "",value) #CHECK IF THE VALUE IS A NUMBER
             value = int(value)
             triplesL = triplesL + value
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 triples = q.getNumTripleQuery(url) #COUNT THE NUMBER OF TRIPLES WITH A SPARQL QUERY
@@ -1401,7 +1418,7 @@ class KnowledgeGraph:
         Returns:
             int: An integer that is the number of triples.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         metadata = aggregator.getDataPackage(self.id)
         if isinstance(url,str):
             try:
@@ -1421,7 +1438,7 @@ class KnowledgeGraph:
         Returns:
             int: An integer that is the number of entities in the KG.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
             try:
@@ -1476,7 +1493,7 @@ class KnowledgeGraph:
         Returns:
             int: An integer that is the number of properties in the KG.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 numProperty = q.numberOfProperty(url)
@@ -1496,7 +1513,7 @@ class KnowledgeGraph:
         Returns:
             list: A list that contains all the URI in the KG.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 lengthtList = []
@@ -1530,7 +1547,7 @@ class KnowledgeGraph:
         Returns:
             list: A list that contains all the URI in the object position
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 uriListO = q.getAllObject(url)
@@ -1562,7 +1579,7 @@ class KnowledgeGraph:
         Returns:
             list: A list that contains URIs in the predicate position.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 uriListP = q.getAllPredicate(url)
@@ -1594,7 +1611,7 @@ class KnowledgeGraph:
         Returns:
             bool: A boolean that is True if are used, False otherwise.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 rdf = q.checkRDFDataStructures(url)
@@ -1615,7 +1632,7 @@ class KnowledgeGraph:
             bool: A boolean that is True if no new terms are defined, False otherwise.
 
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 objList = []
@@ -1639,7 +1656,7 @@ class KnowledgeGraph:
         Returns:
             bool: A boolean that is True if no new vocabularies are defined, False otherwise.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 newVocab = []
@@ -1669,7 +1686,7 @@ class KnowledgeGraph:
         Returns:
             int: An integer that is the number of label in the KG.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 numLabel = q.getNumLabel(url)
@@ -1687,7 +1704,7 @@ class KnowledgeGraph:
         Returns:
             list: A list with the URI regex
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         voidFile = utils.checkVoidFile(self.id)
         if isinstance(url,str):
             regex = []
@@ -1743,7 +1760,7 @@ class KnowledgeGraph:
         Returns:    
             int: An integer that represent the number of blank node in the KG.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 numBlankN = q.numBlankNode(url)
@@ -1764,7 +1781,7 @@ class KnowledgeGraph:
             list: formats: A list that contains all the serialization formats supported by the KG recovered from data or VoID file.
             list: media_types_metadata: A list that contains all the serialization formats supported by the KG recovered from metadata.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         voidFile = utils.checkVoidFile(self.id)
         other_resources = aggregator.getOtherResources(self.id)
         media_types_metadata = utils.extract_media_type(other_resources)
@@ -1790,7 +1807,7 @@ class KnowledgeGraph:
         Returns:
             list: A list with all the languages supprted by the KG.
         """
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         if isinstance(url,str):
             try:
                 languages = q.getLangugeSupported(url)
@@ -1809,7 +1826,7 @@ class KnowledgeGraph:
             list: A list with all the links to access to the KG.
         """
         links = []
-        url = aggregator.getSPARQLEndpoint(self.id)
+        url = aggregator.getSPARQLEndpoint(self)
         voidFile = utils.checkVoidFile(self.id)
         resources = aggregator.getOtherResources(self.id)
         resources = utils.insertAvailability(resources)
